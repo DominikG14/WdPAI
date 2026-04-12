@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+}
+
+nav {
+  background-color: purple;
+}
+
+nav .logo > i {
+    font-size: 2rem;
+}
+
+nav > div.container {
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav > div.container > ul {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  list-style-type: none;
+}
+
+nav > div.container > ul > li > a {
+  text-decoration: none;
+  color: white;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+nav a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: center;
+  align-items: center;
+}
+
+nav a > i {
+  font-size: 1.25rem;
+}
