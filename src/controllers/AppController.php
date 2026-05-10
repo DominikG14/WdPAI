@@ -1,35 +1,73 @@
 <?php
 
+require_once 'AppController.php';
+require_once __DIR__.'/../repositories/UsersRepository.php';
 
-class AppController {
-    protected function isGet(): bool
+class SecurityController extends AppController {
+
+    private $usersRepository;
+
+    public function __construct()
     {
-        return $_SERVER["REQUEST_METHOD"] === 'GET';
+        // USUNIĘTO: parent::__construct(); -> to powodowało błąd
+        $this->usersRepository = new UsersRepository();
     }
 
-    protected function isPost(): bool
-    {
-        return $_SERVER["REQUEST_METHOD"] === 'POST';
-    }
- 
-    protected function render(string $template = null, array $variables = [])
-    {
-        $templatePath = 'public/views/'. $template.'.html';
-        $templatePath404 = 'public/views/404.html';
-        $output = "";
-                 
-        if(file_exists($templatePath)){
-            extract($variables);
-            
-            ob_start();
-            include $templatePath;
-            $output = ob_get_clean();
-        } else {
-            ob_start();
-            include $templatePath404;
-            $output = ob_get_clean();
+    public function login() {
+        if (!$this->isPost()) {
+            return $this->render("login");
         }
-        echo $output;
+
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        $user = $this->usersRepository->getUserByEmail($email);
+
+        if (!$user) {
+            return $this->render("login", ['messages' => ['Użytkownik o tym adresie nie istnieje!']]);
+        }
+
+        // W bazie masz pole 'password', sprawdzamy hash
+        if (!password_verify($password, $user['password'])) {
+            return $this->render("login", ['messages' => ['Błędne hasło!']]);
+        }
+
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/dashboard");
+        exit();
     }
 
+    public function register() {
+        if (!$this->isPost()) {
+            return $this->render("register");
+        }
+
+        $email = $_POST['email'] ?? '';
+        $username = $_POST['username'] ?? ''; // Pamiętaj o dodaniu tego do HTML
+        $password = $_POST['password'] ?? '';
+        $passwordConfirm = $_POST['password2'] ?? '';
+        $firstName = $_POST['firstName'] ?? '';
+        $lastName = $_POST['lastName'] ?? '';
+
+        if ($password !== $passwordConfirm) {
+            return $this->render("register", ['messages' => ['Hasła nie są identyczne!']]);
+        }
+
+        // Przygotowujemy dane zgodnie z Twoim schematem SQL (username, email, password, full_name)
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $fullName = trim($firstName . ' ' . $lastName);
+
+        try {
+            $this->usersRepository->createUser(
+                $username,
+                $email,
+                $hashedPassword,
+                $fullName
+            );
+        } catch (\Exception $e) {
+            return $this->render("register", ['messages' => ['Email lub login jest już zajęty!']]);
+        }
+
+        return $this->render("login", ['messages' => ['Zarejestrowano pomyślnie!']]);
+    }
 }

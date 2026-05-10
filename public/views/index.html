@@ -5,5 +5,12 @@
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
+    <main>
+        <h1>INDEX</h1>
+        <?php foreach($users as $key=>$value): ?>
+        <span><?= $value["username"]; ?></span>
+        <br />
+        <?php endforeach; ?>
+    </main>
 </body>
 </html>

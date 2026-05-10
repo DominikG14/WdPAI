@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>Register</title>
+</head>
+<body>
+    <div class="container">
+        <form method="POST" action="/register">
+            <h1>REGISTER FORM</h1>
+
+            <?php if(isset($messages)): ?>
+                <div class="messages">
+                    <?php foreach($messages as $message): ?>
+                        <p style="color: red;"><?= $message; ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <input name="username" type="text" placeholder="Nazwa użytkownika" required />
+            
+            <input name="email" type="email" placeholder="Twój email" required />
+            
+            <input name="password" type="password" placeholder="Twoje hasło" required />
+            <input name="password2" type="password" placeholder="Powtórz hasło" required />
+
+            <input name="firstName" type="text" placeholder="Imię" />
+            <input name="lastName" type="text" placeholder="Nazwisko" />
+            
+            <button type="submit">REGISTER</button>
+        </form>
+    </div>
+</body>
+</html>

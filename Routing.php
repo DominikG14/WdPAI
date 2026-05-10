@@ -25,6 +25,10 @@ class Routing {
             "controller" => "DashboardController",
             "action" => "index"
         ],
+        "register" => [
+            "controller" => "SecurityController",
+            "action" => "register"
+        ],
     ];
 
     private static $instances = [];

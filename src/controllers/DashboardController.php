@@ -1,20 +1,19 @@
 <?php
 
 require_once 'AppController.php';
+require_once __DIR__.'/../repositories/UsersRepository.php';
 
 class DashboardController extends AppController {
 
-    public function dashboard($id = null) {
-        // TODO pobieranie danych z bazy
-        // wstawianie zmiennych na widok
+public function index() {
+    $title = "INDEX";
+    $usersRepository = new UsersRepository();
+    $users = $usersRepository->getUsers();
 
-        return $this->render("dashboard", [
-            'id' => $id,
-        ]);
-    }
-
-    public function index($id = null) {
-
-        return $this->render("index");
-    }
+    // Przekazujemy wszystkie dane w jednej tablicy
+    return $this->render("index", [
+        "title" => $title, 
+        "users" => $users
+    ]);
+}
 }
