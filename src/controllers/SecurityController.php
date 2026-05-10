@@ -13,68 +13,90 @@ class SecurityController extends AppController {
         $this->usersRepository = new UsersRepository();
     }
 
-    public function login() {
+    public function register() {
         if (!$this->isPost()) {
-            return $this->render("login");
+            return $this->render("register");
         }
 
+        // 1. Pobranie danych z formularza (zgodnie z atrybutami 'name' w HTML)
+        $username = $_POST['username'] ?? '';
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
+        $password2 = $_POST['password2'] ?? ''; // W HTML masz 'password2'
+        $firstName = $_POST['firstName'] ?? '';
+        $lastName = $_POST['lastName'] ?? '';
+        $fullName = $firstName . " " . $lastName;
 
-        $user = $this->usersRepository->getUserByEmail($email);
-
-        if (!$user) {
-            return $this->render("login", ['messages' => ['Użytkownik o tym adresie email nie istnieje!']]);
+        // 2. Walidacja
+        if (empty($username) || empty($email) || empty($password)) {
+            return $this->render("register", ['messages' => ['Proszę wypełnić wymagane pola!']]);
         }
 
-        if (!password_verify($password, $user['password'])) {
-            return $this->render("login", ['messages' => ['Błędne hasło!']]);
+        if ($password !== $password2) {
+            return $this->render("register", ['messages' => ['Hasła nie są identyczne!']]);
         }
 
-        // Tutaj możesz ustawić sesję, np.:
-        // session_start();
-        // $_SESSION['user_id'] = $user['id'];
+        // 3. Sprawdzenie czy użytkownik/email już istnieje
+        if ($this->usersRepository->getUserByEmail($email)) {
+            return $this->render("register", ['messages' => ['Użytkownik o tym adresie email już istnieje!']]);
+        }
+        
+        // Opcjonalnie: sprawdzenie unikalności username
+        // if ($this->usersRepository->getUserByUsername($username)) ...
 
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/dashboard");
-        exit();
+        // 4. Haszowanie hasła
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+        // 5. Zapis do bazy danych
+        try {
+            $this->usersRepository->addUser(
+                $username, 
+                $email, 
+                $hashedPassword, 
+                $fullName
+            );
+        } catch (Exception $e) {
+            // Logowanie błędu bazy danych
+            return $this->render("register", ['messages' => ['Błąd rejestracji. Spróbuj ponownie później.']]);
+        }
+
+        return $this->render("login", ['messages' => ['Rejestracja zakończona sukcesem!']]);
     }
 
-    public function register() {
-        if ($this->isPost()) {
-            // 1. Pobranie danych z POST
-            $email = $_POST['email'] ?? '';
-            $password = $_POST['password'] ?? '';
-            $confirmedPassword = $_POST['confirmedPassword'] ?? '';
+    public function login() {
+    if (!$this->isPost()) {
+        return $this->render("login");
+    }
 
-            // 2. Prosta walidacja (warto ją wydzielić do osobnej klasy/metody)
-            if (empty($email) || empty($password)) {
-                return $this->render("register", ['messages' => ['Proszę wypełnić wszystkie pola!']]);
-            }
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-            if ($password !== $confirmedPassword) {
-                return $this->render("register", ['messages' => ['Hasła nie są identyczne!']]);
-            }
+    $user = $this->usersRepository->getUserByEmail($email);
 
-            // 3. Haszowanie hasła - NIGDY nie zapisuj czystego tekstu
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+    if (!$user) {
+        return $this->render("login", ['messages' => ['Użytkownik nie istnieje!']]);
+    }
 
-            // 4. Zapis do bazy danych (przykład z użyciem repozytorium/modelu)
-            $userRepository = new UserRepository();
-            
-            // Sprawdź czy użytkownik już istnieje
-            if ($userRepository->getUserByEmail($email)) {
-                return $this->render("register", ['messages' => ['Użytkownik o tym adresie już istnieje!']]);
-            }
+    if (!password_verify($password, $user['password'])) {
+        return $this->render("login", ['messages' => ['Błędne hasło!']]);
+    }
 
-            // Tworzenie nowego obiektu User i zapis
-            $user = new User($email, $hashedPassword);
-            $userRepository->addUser($user);
+    // --- LOGIKA SESJI ---
+    session_regenerate_id(true); // bezpieczeństwo: zapobiega Session Fixation
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user_email'] = $user['email'];
+    // Możesz dodać więcej danych, np. rolę: $_SESSION['role'] = $user['role'];
 
-            // 5. Przekierowanie po sukcesie
-            return $this->render("login", ['messages' => ['Rejestracja zakończona sukcesem! Możesz się zalogować.']]);
-        }
+    $url = "http://$_SERVER[HTTP_HOST]";
+    header("Location: {$url}/dashboard");
+    exit();
+}
 
-        return $this->render("register");
+    public function logout()
+    {
+        session_destroy();
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/login");
+        exit();
     }
 }

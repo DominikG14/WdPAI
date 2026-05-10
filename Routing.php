@@ -11,11 +11,11 @@ class Routing {
         ],
         "dashboard" => [
             "controller" => "DashboardController",
-            "action" => "dashboard"
+            "action" => "index"
         ],
         "dashboard/([0-9]+)" => [
             "controller" => "DashboardController",
-            "action" => "dashboard"
+            "action" => "index"
         ],
         "" => [
             "controller" => "SecurityController",
@@ -28,6 +28,10 @@ class Routing {
         "register" => [
             "controller" => "SecurityController",
             "action" => "register"
+        ],
+        "logout" => [
+            "controller" => "SecurityController",
+            "action" => "logout"
         ],
     ];
 
