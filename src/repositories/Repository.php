@@ -7,6 +7,6 @@ class Repository {
     protected $database;
 
     public function __construct() {
-        $this->database = new Database();
+        $this->database = Database::getInstance();
     }
 }

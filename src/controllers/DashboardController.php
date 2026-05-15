@@ -11,7 +11,6 @@ public function index() {
     $usersRepository = new UsersRepository();
     $users = $usersRepository->getUsers();
 
-    // Przekazujemy wszystkie dane w jednej tablicy
     return $this->render("index", [
         "title" => $title, 
         "users" => $users

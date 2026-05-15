@@ -11,7 +11,7 @@ class AppController {
     protected function isGet(): bool { return $this->request === 'GET'; }
     protected function isPost(): bool { return $this->request === 'POST'; }
 
-    // METODA ZABEZPIECZAJĄCA
+
     protected function requireLogin()
     {
         if (!isset($_SESSION['user_id'])) {
@@ -23,7 +23,7 @@ class AppController {
 
     protected function render(string $template = null, array $variables = [])
     {
-        $templatePath = 'public/views/'. $template.'.html'; // Zmień na .php jeśli posłuchałeś wcześniejszej rady
+        $templatePath = 'public/views/'. $template.'.html';
                  
         if(file_exists($templatePath)){
             extract($variables);
