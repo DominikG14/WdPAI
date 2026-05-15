@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <?php include __DIR__ . '/partials/head.html'; ?>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>Dashboard - Lista Użytkowników</title>
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
     <main>
         <h1>INDEX</h1>
-        <?php foreach($users as $key=>$value): ?>
-        <span><?= $value["username"]; ?></span>
-        <br />
-        <?php endforeach; ?>
+        
+        <?php if(isset($users)): ?>
+            <?php foreach($users as $user): ?>
+                <div class="user-row">
+                    <span>Użytkownik: <?= $user->getUsername(); ?></span>
+                    <span>Email: <?= $user->getEmail(); ?></span>
+                    <br />
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
     </main>
 </body>
 </html>

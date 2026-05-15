@@ -4,13 +4,39 @@ require_once 'AppController.php';
 require_once __DIR__.'/../repositories/UsersRepository.php';
 
 class SecurityController extends AppController {
-
     private $usersRepository;
 
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         $this->usersRepository = new UsersRepository();
+    }
+
+    public function login() {
+        if (!$this->isPost()) {
+            return $this->render("login");
+        }
+
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        $user = $this->usersRepository->getUserByEmail($email);
+
+        if (!$user) {
+            return $this->render("login", ['messages' => ['Użytkownik nie istnieje!']]);
+        }
+
+        // Używamy metody getPassword() z obiektu User [cite: 72]
+        if (!password_verify($password, $user->getPassword())) {
+            return $this->render("login", ['messages' => ['Błędne hasło!']]);
+        }
+
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $user->getId();
+        $_SESSION['user_email'] = $user->getEmail();
+
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/dashboard");
+        exit();
     }
 
     public function register() {
@@ -26,71 +52,21 @@ class SecurityController extends AppController {
         $lastName = $_POST['lastName'] ?? '';
         $fullName = $firstName . " " . $lastName;
 
-
         if (empty($username) || empty($email) || empty($password)) {
-            return $this->render("register", ['messages' => ['Proszę wypełnić wymagane pola!']]);
+            return $this->render("register", ['messages' => ['Uzupełnij pola!']]);
         }
 
         if ($password !== $password2) {
-            return $this->render("register", ['messages' => ['Hasła nie są identyczne!']]);
+            return $this->render("register", ['messages' => ['Hasła różnią się!']]);
         }
-
 
         if ($this->usersRepository->getUserByEmail($email)) {
-            return $this->render("register", ['messages' => ['Użytkownik o tym adresie email już istnieje!']]);
+            return $this->render("register", ['messages' => ['Email zajęty!']]);
         }
-        
-        // Opcjonalnie: sprawdzenie unikalności username
-        // if ($this->usersRepository->getUserByUsername($username)) ...
 
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $this->usersRepository->addUser($username, $email, $hashedPassword, $fullName);
 
-        try {
-            $this->usersRepository->addUser(
-                $username, 
-                $email, 
-                $hashedPassword, 
-                $fullName
-            );
-        } catch (Exception $e) {
-            return $this->render("register", ['messages' => ['Błąd rejestracji. Spróbuj ponownie później.']]);
-        }
-
-        return $this->render("login", ['messages' => ['Rejestracja zakończona sukcesem!']]);
-    }
-
-    public function login() {
-    if (!$this->isPost()) {
-        return $this->render("login");
-    }
-
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    $user = $this->usersRepository->getUserByEmail($email);
-
-    if (!$user) {
-        return $this->render("login", ['messages' => ['Użytkownik nie istnieje!']]);
-    }
-
-    if (!password_verify($password, $user['password'])) {
-        return $this->render("login", ['messages' => ['Błędne hasło!']]);
-    }
-
-    session_regenerate_id(true);
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['user_email'] = $user['email'];
-
-    $url = "http://$_SERVER[HTTP_HOST]";
-    header("Location: {$url}/dashboard");
-    exit();
-}
-
-    public function logout()
-    {
-        session_destroy();
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/login");
-        exit();
+        return $this->render("login", ['messages' => ['Zarejestrowano pomyślnie!']]);
     }
 }

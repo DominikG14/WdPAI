@@ -2,24 +2,32 @@
 <html lang="en">
 <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>Logowanie</title>
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
-        <form method="POST" action="\login">
-      <h1>LOGIN</h1>
+    
+    <div class="container">
+        <form method="POST" action="/login">
+            <h1>LOGIN</h1>
 
-      <?php if(isset($messages)): ?>
+            <?php if(isset($messages)): ?>
+                <div class="messages">
+                    <?php foreach($messages as $message): ?>
+                        <p><?= $message; ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
 
-      <p class="messages">
-        <?= $messages ?>
-      </p>
+            <input name="email" type="email" placeholder="Twój email" required />
+            <input name="password" type="password" placeholder="Twoje hasło" required />
+            
+            <button type="submit">LOGIN</button>
 
-      <?php endif; ?>
-      <input name="email" type="email" placeholder="Twój email" />
-      <input name="password" type="password" placeholder="Twoje hasło" />
-      <button type="submit">LOGIN</button>
-
-      <a href="/register">zarejestruj się!</a>
-    </form>
+            <div class="form-footer">
+                <a href="/register">Nie masz konta? Zarejestruj się!</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
