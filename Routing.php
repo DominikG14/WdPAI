@@ -9,17 +9,9 @@ class Routing {
             "controller" => "SecurityController",
             "action" => "login"
         ],
-        "dashboard" => [
-            "controller" => "DashboardController",
-            "action" => "index"
-        ],
-        "dashboard/([0-9]+)" => [
-            "controller" => "DashboardController",
-            "action" => "index"
-        ],
         "" => [
-            "controller" => "SecurityController",
-            "action" => "login"
+            "controller" => "DashboardController",
+            "action" => "index"
         ],
         "index" => [
             "controller" => "DashboardController",

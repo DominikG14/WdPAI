@@ -9,4 +9,8 @@ class Repository {
     public function __construct() {
         $this->database = Database::getInstance();
     }
+
+    protected function getPDO(): PDO {
+        return $this->database->connect(); 
+    }
 }

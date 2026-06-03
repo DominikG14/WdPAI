@@ -12,13 +12,12 @@ class UsersRepository extends Repository {
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
-        $user = $stmt->fetch(PDO::FETCH_ASSOC); // Etap 1: Pobranie tablicy [cite: 52]
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$user) {
             return null;
         }
 
-        // Etap 2: Mapowanie na obiekt (Entity) [cite: 58]
         return new User(
             $user['username'],
             $user['email'],
