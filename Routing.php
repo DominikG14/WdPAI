@@ -2,6 +2,7 @@
 
 require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/DashboardController.php';
+require_once 'src/controllers/ExerciseController.php';
 
 class Routing {
     public static $routes = [
@@ -25,6 +26,10 @@ class Routing {
             "controller" => "SecurityController",
             "action" => "logout"
         ],
+        "exercises/field/(\d+)" => [
+            "controller" => "ExerciseController",
+            "action" => "field"
+        ]
     ];
 
     private static $instances = [];
@@ -43,6 +48,7 @@ class Routing {
                 
                 $controllerObj = self::$instances[$controllerName];
 
+                // Dzięki nawiasom w "exercises/field/(\d+)", tutaj pod $matches[1] wskoczy ID działu (np. 1, 2, 3...)
                 $id = $matches[1] ?? null;
 
                 $controllerObj->$action($id);

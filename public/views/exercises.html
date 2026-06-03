@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>Zadania z działu</title>
+    <style>
+        .exercises-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .exercise-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .exercise-card img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 15px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+    <main class="exercises-container">
+        <a href="/" class="back-link">&larr; Powrót do strony głównej</a>
+
+        <h1>Zadania z wybranego działu</h1>
+
+        <?php if(isset($exercises) && !empty($exercises)): ?>
+            <?php foreach($exercises as $exercise): ?>
+                <div class="exercise-card">
+                    <h3>Zadanie (Typ: <?= htmlspecialchars($exercise['type']); ?>)</h3>
+                    <img src="/<?= htmlspecialchars($exercise['image_url']); ?>" alt="Treść zadania">
+                    <p style="color: #666; font-size: 14px;">Poprawna odpowiedź: <?= htmlspecialchars($exercise['right_answer']); ?></p>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>Nie znaleziono jeszcze żadnych zadań dodanych do tego działu.</p>
+        <?php endif; ?>
+    </main>
+</body>
+</html>
