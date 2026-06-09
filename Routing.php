@@ -5,7 +5,7 @@ require_once 'src/controllers/DashboardController.php';
 require_once 'src/controllers/ExerciseController.php';
 
 class Routing {
-    public static $routes = [
+public static $routes = [
         "login" => [
             "controller" => "SecurityController",
             "action" => "login"
@@ -18,6 +18,11 @@ class Routing {
             "controller" => "DashboardController",
             "action" => "index"
         ],
+        // DODAJEMY TĘ LINIJKĘ:
+        "dashboard" => [
+            "controller" => "DashboardController",
+            "action" => "dashboard"
+        ],
         "register" => [
             "controller" => "SecurityController",
             "action" => "register"
@@ -26,7 +31,6 @@ class Routing {
             "controller" => "SecurityController",
             "action" => "logout"
         ],
-        // DODAJ TĘ REGUŁĘ TUTAJ (zanim router zacznie szukać cyfr):
         "exercises/save" => [
             "controller" => "ExerciseController",
             "action" => "save"
@@ -36,7 +40,7 @@ class Routing {
             "action" => "field"
         ]
     ];
-
+    
     private static $instances = [];
 
     public static function run(string $path) {
