@@ -36,6 +36,15 @@ CREATE TABLE user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
+CREATE TABLE user_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    field_id INT REFERENCES fields(id) ON DELETE CASCADE,
+    score INT NOT NULL,
+    total INT NOT NULL,
+    solved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO roles (name) VALUES 
 ('ADMIN');
 

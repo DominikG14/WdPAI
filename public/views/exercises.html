@@ -2,10 +2,10 @@
 <html lang="pl">
 <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>Zadania z działu</title>
+    <title>MaturaMat - Quiz</title>
     <style>
-        .exercises-container {
-            max-width: 800px;
+        .quiz-container {
+            max-width: 700px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -15,42 +15,174 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: none; 
+        }
+        .exercise-card.active {
+            display: block;
         }
         .exercise-card img {
             max-width: 100%;
             height: auto;
             display: block;
+            margin: 15px 0;
+        }
+        .options-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-option {
+            padding: 12px 24px;
+            border: 1px solid #007bff;
+            background: #fff;
+            color: #007bff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-option:hover {
+            background: #007bff;
+            color: white;
+        }
+        .summary-card {
+            display: none;
+            text-align: center;
+            background: #e9ecef;
+            border: 2px solid #28a745;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .progress-bar {
+            font-size: 14px;
+            color: #666;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
             color: #007bff;
             text-decoration: none;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
 
-    <main class="exercises-container">
-        <a href="/" class="back-link">&larr; Powrót do strony głównej</a>
+    <main class="quiz-container">
+        <a href="/index" class="back-link">&larr; Przerwij i wróć do menu</a>
 
-        <h1>Zadania z wybranego działu</h1>
+        <div id="quiz-section">
+            <div class="progress-bar" id="quiz-progress">Zadanie 1 z X</div>
 
-        <?php if(isset($exercises) && !empty($exercises)): ?>
-            <?php foreach($exercises as $exercise): ?>
-                <div class="exercise-card">
-                    <h3>Zadanie (Typ: <?= htmlspecialchars($exercise['type']); ?>)</h3>
-                    <img src="/<?= htmlspecialchars($exercise['image_url']); ?>" alt="Treść zadania">
-                    <p style="color: #666; font-size: 14px;">Poprawna odpowiedź: <?= htmlspecialchars($exercise['right_answer']); ?></p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>Nie znaleziono jeszcze żadnych zadań dodanych do tego działu.</p>
-        <?php endif; ?>
+            <?php if (isset($exercises) && !empty($exercises)): ?>
+                <?php foreach ($exercises as $index => $exercise): ?>
+                    <div class="exercise-card <?= $index === 0 ? 'active' : ''; ?>" data-id="<?= $exercise['id']; ?>" data-correct="<?= htmlspecialchars($exercise['right_answer']); ?>">
+                        <h4>Zadanie <?= $index + 1; ?></h4>
+                        
+                        <img src="/<?= ltrim(htmlspecialchars($exercise['image_url']), '/'); ?>" alt="Treść zadania">
+
+                        <div class="options-group">
+                            <?php if ($exercise['type'] === 'ABCD'): ?>
+                                <?php foreach (['A', 'B', 'C', 'D'] as $letter): ?>
+                                    <button type="button" class="btn-option" onclick="handleAnswerClick(this, '<?= $letter; ?>')"><?= $letter; ?></button>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <?php foreach (['PP', 'PF', 'FP', 'FF'] as $pair): ?>
+                                    <button type="button" class="btn-option" onclick="handleAnswerClick(this, '<?= $pair; ?>')"><?= $pair; ?></button>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>Brak zadań w tym dziale.</p>
+            <?php endif; ?>
+        </div>
+
+        <div id="summary-section" class="summary-card">
+            <h2>Koniec testu! Podsumowanie</h2>
+            <p style="font-size: 24px; margin: 20px 0;">
+                Twój wynik to: <strong id="score-rating">0 / 0</strong>
+            </p>
+            <p id="feedback-text"></p>
+            <a href="/index" class="btn-option" style="display: inline-block; text-decoration: none; margin-top: 15px; background: #007bff; color: white;">Rozwiąż inny dział</a>
+        </div>
     </main>
+
+    <script>
+        let currentIdx = 0;
+        const cards = document.querySelectorAll('.exercise-card');
+        const totalCount = cards.length;
+
+        // Aktualizacja paska postępu na starcie
+        updateProgress();
+
+        function handleAnswerClick(button, val) {
+            // 1. Zapisz odpowiedź w atrybucie karty zadania
+            const currentCard = cards[currentIdx];
+            currentCard.setAttribute('data-user-answer', val);
+
+            // Wizualny efekt kliknięcia przed zmianą pytania (krótkie podświetlenie)
+            button.style.background = "#0056b3";
+            button.style.color = "white";
+
+            // 2. Opóźnienie rzędu 200ms, aby użytkownik zarejestrował kliknięcie, a następnie automatyczna zmiana pytania
+            setTimeout(() => {
+                currentCard.classList.remove('active');
+                currentIdx++;
+
+                if (currentIdx >= totalCount) {
+                    checkQuiz();
+                } else {
+                    cards[currentIdx].classList.add('active');
+                    updateProgress();
+                }
+            }, 200);
+        }
+
+        function updateProgress() {
+            const progressText = document.getElementById('quiz-progress');
+            if (progressText && totalCount > 0) {
+                progressText.innerText = `Zadanie ${currentIdx + 1} z ${totalCount}`;
+            }
+        }
+
+        function checkQuiz() {
+            let correctCount = 0;
+
+            cards.forEach(card => {
+                const correctAnswer = card.getAttribute('data-correct');
+                const userAnswer = card.getAttribute('data-user-answer');
+
+                if (userAnswer && userAnswer.toUpperCase() === correctAnswer.toUpperCase()) {
+                    correctCount++;
+                }
+            });
+
+            // Ukrycie interfejsu quizu i paska postępu
+            document.getElementById('quiz-section').style.display = 'none';
+
+            // Uzyskanie i wyświetlenie podsumowania punktacji
+            document.getElementById('score-rating').innerText = `${correctCount} / ${totalCount}`;
+            
+            const percentage = (correctCount / totalCount) * 100;
+            const feedback = document.getElementById('feedback-text');
+            if (percentage === 100) {
+                feedback.innerText = "Perfekcyjnie! Jesteś w pełni gotowy na maturę! 🎯";
+            } else if (percentage >= 50) {
+                feedback.innerText = "Dobry wynik! Masz już solidne podstawy, pracuj dalej! 👍";
+            } else {
+                feedback.innerText = "Musisz jeszcze trochę poćwiczyć ten dział. Nie poddawaj się! 💪";
+            }
+
+            document.getElementById('summary-section').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
