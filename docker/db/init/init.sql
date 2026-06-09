@@ -36,10 +36,22 @@ CREATE TABLE user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
+CREATE TABLE user_progress (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    field_id INT REFERENCES fields(id) ON DELETE CASCADE,
+    score INT NOT NULL,
+    total INT NOT NULL,
+    solved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- JEDYNA ROLA W SYSTEMIE - DLA POTENCJALNYCH ADMINISTRATORÓW W PRZYSZŁOŚCI
 INSERT INTO roles (name) VALUES 
 ('ADMIN');
 
+-- WPISYWANIE DZIAŁÓW MATEMATYCZNYCH
 INSERT INTO fields (number, name) VALUES
+('0', 'Mieszane zadania'),
 ('I', 'Liczby rzeczywiste'),
 ('II', 'Wyrażenia algebraiczne'),
 ('III', 'Równania i nierówności'),
@@ -55,61 +67,109 @@ INSERT INTO fields (number, name) VALUES
 ('XIII', 'Statystyka'),
 ('XIV', 'Optymalizacja');
 
+-- BAZA ZADAŃ MATURALNYCH
 INSERT INTO exercises (field_id, image_url, type, right_answer) VALUES
-(1, 'public/images/exercises/1/1.png', 'ABCD', 'C'),
-(1, 'public/images/exercises/1/2.png', 'ABCD', 'C'),
-(1, 'public/images/exercises/1/3.png', 'ABCD', 'B'),
-(1, 'public/images/exercises/1/4.png', 'ABCD', 'B'),
-(1, 'public/images/exercises/1/5.png', 'ABCD', 'B'),
-(1, 'public/images/exercises/1/6.png', 'ABCD', 'C'),
-(1, 'public/images/exercises/1/7.png', 'ABCD', 'B'),
-(1, 'public/images/exercises/1/8.png', 'PF', 'PP'),
-(2, 'public/images/exercises/2/1.png', 'ABCD', 'A'),
-(2, 'public/images/exercises/2/2.png', 'ABCD', 'A'),
-(2, 'public/images/exercises/2/3.png', 'ABCD', 'A'),
-(3, 'public/images/exercises/3/1.png', 'ABCD', 'B'),
-(3, 'public/images/exercises/3/2.png', 'ABCD', 'C'),
-(3, 'public/images/exercises/3/3.png', 'ABCD', 'D'),
-(4, 'public/images/exercises/4/1.png', 'ABCD', 'D'),
-(5, 'public/images/exercises/5/1.png', 'PF', 'PF'),
-(5, 'public/images/exercises/5/2.png', 'ABCD', 'C'),
-(5, 'public/images/exercises/5/3.png', 'ABCD', 'A'),
-(5, 'public/images/exercises/5/4.png', 'ABCD', 'D'),
-(5, 'public/images/exercises/5/5.png', 'PF', 'FF'),
-(5, 'public/images/exercises/5/6.png', 'ABCD', 'A'),
-(5, 'public/images/exercises/5/7.png', 'ABCD', 'D'),
-(6, 'public/images/exercises/6/1.png', 'ABCD', 'C'),
-(6, 'public/images/exercises/6/2.png', 'PF', 'PP'),
-(6, 'public/images/exercises/6/3.png', 'ABCD', 'C'),
-(6, 'public/images/exercises/6/4.png', 'ABCD', 'B'),
-(7, 'public/images/exercises/7/1.png', 'ABCD', 'B'),
-(7, 'public/images/exercises/7/2.png', 'ABCD', 'A'),
-(7, 'public/images/exercises/7/3.png', 'ABCD', 'C'),
-(7, 'public/images/exercises/7/4.png', 'ABCD', 'D'),
-(8, 'public/images/exercises/8/1.png', 'ABCD', 'C'),
-(8, 'public/images/exercises/8/2.png', 'ABCD', 'B'),
-(8, 'public/images/exercises/8/3.png', 'ABCD', 'C'),
-(8, 'public/images/exercises/8/4.png', 'ABCD', 'B'),
-(9, 'public/images/exercises/9/1.png', 'ABCD', 'B'),
-(9, 'public/images/exercises/9/2.png', 'ABCD', 'D'),
-(9, 'public/images/exercises/9/3.png', 'ABCD', 'B'),
-(9, 'public/images/exercises/9/4.png', 'ABCD', 'D'),
-(9, 'public/images/exercises/9/5.png', 'PF', 'PF'),
-(10, 'public/images/exercises/10/1.png', 'ABCD', 'D'),
-(10, 'public/images/exercises/10/2.png', 'PF', 'PP'),
-(11, 'public/images/exercises/11/1.png', 'ABCD', 'A'),
-(11, 'public/images/exercises/11/2.png', 'ABCD', 'A'),
-(13, 'public/images/exercises/13/1.png', 'ABCD', 'A'),
-(13, 'public/images/exercises/13/2.png', 'ABCD', 'C'),
-(13, 'public/images/exercises/13/3.png', 'PF', 'PP'),
-(13, 'public/images/exercises/13/4.png', 'ABCD', 'C'),
-(14, 'public/images/exercises/14/1.png', 'ABCD', 'D'),
-(14, 'public/images/exercises/14/2.png', 'ABCD', 'A');
+(2, 'public/images/exercises/1/1.png', 'ABCD', 'C'),
+(2, 'public/images/exercises/1/2.png', 'ABCD', 'C'),
+(2, 'public/images/exercises/1/3.png', 'ABCD', 'B'),
+(2, 'public/images/exercises/1/4.png', 'ABCD', 'B'),
+(2, 'public/images/exercises/1/5.png', 'ABCD', 'B'),
+(2, 'public/images/exercises/1/6.png', 'ABCD', 'C'),
+(2, 'public/images/exercises/1/7.png', 'ABCD', 'B'),
+(2, 'public/images/exercises/1/8.png', 'PF', 'PP'),
+(3, 'public/images/exercises/2/1.png', 'ABCD', 'A'),
+(3, 'public/images/exercises/2/2.png', 'ABCD', 'A'),
+(3, 'public/images/exercises/2/3.png', 'ABCD', 'A'),
+(4, 'public/images/exercises/3/1.png', 'ABCD', 'B'),
+(4, 'public/images/exercises/3/2.png', 'ABCD', 'C'),
+(4, 'public/images/exercises/3/3.png', 'ABCD', 'D'),
+(5, 'public/images/exercises/4/1.png', 'ABCD', 'D'),
+(6, 'public/images/exercises/5/1.png', 'PF', 'PF'),
+(6, 'public/images/exercises/5/2.png', 'ABCD', 'C'),
+(6, 'public/images/exercises/5/3.png', 'ABCD', 'A'),
+(6, 'public/images/exercises/5/4.png', 'ABCD', 'D'),
+(6, 'public/images/exercises/5/5.png', 'PF', 'FF'),
+(6, 'public/images/exercises/5/6.png', 'ABCD', 'A'),
+(6, 'public/images/exercises/5/7.png', 'ABCD', 'D'),
+(7, 'public/images/exercises/6/1.png', 'ABCD', 'C'),
+(7, 'public/images/exercises/6/2.png', 'PF', 'PP'),
+(7, 'public/images/exercises/6/3.png', 'ABCD', 'C'),
+(7, 'public/images/exercises/6/4.png', 'ABCD', 'B'),
+(8, 'public/images/exercises/7/1.png', 'ABCD', 'B'),
+(8, 'public/images/exercises/7/2.png', 'ABCD', 'A'),
+(8, 'public/images/exercises/7/3.png', 'ABCD', 'C'),
+(8, 'public/images/exercises/7/4.png', 'ABCD', 'D'),
+(9, 'public/images/exercises/8/1.png', 'ABCD', 'C'),
+(9, 'public/images/exercises/8/2.png', 'ABCD', 'B'),
+(9, 'public/images/exercises/8/3.png', 'ABCD', 'C'),
+(9, 'public/images/exercises/8/4.png', 'ABCD', 'B'),
+(10, 'public/images/exercises/9/1.png', 'ABCD', 'B'),
+(10, 'public/images/exercises/9/2.png', 'ABCD', 'D'),
+(10, 'public/images/exercises/9/3.png', 'ABCD', 'B'),
+(10, 'public/images/exercises/9/4.png', 'ABCD', 'D'),
+(10, 'public/images/exercises/9/5.png', 'PF', 'PF'),
+(11, 'public/images/exercises/10/1.png', 'ABCD', 'D'),
+(11, 'public/images/exercises/10/2.png', 'PF', 'PP'),
+(12, 'public/images/exercises/11/1.png', 'ABCD', 'A'),
+(12, 'public/images/exercises/11/2.png', 'ABCD', 'A'),
+(14, 'public/images/exercises/13/1.png', 'ABCD', 'A'),
+(14, 'public/images/exercises/13/2.png', 'ABCD', 'C'),
+(14, 'public/images/exercises/13/3.png', 'PF', 'PP'),
+(14, 'public/images/exercises/13/4.png', 'ABCD', 'C'),
+(15, 'public/images/exercises/14/1.png', 'ABCD', 'D'),
+(15, 'public/images/exercises/14/2.png', 'ABCD', 'A');
 
+-- KILKUNASTU PRZYKŁADOWYCH UŻYTKOWNIKÓW (Czysty tekst, brak hashowania)
 INSERT INTO users (username, email, password) VALUES 
-('admin', 'admin@example.com', 'admin');
+('MatmaMistrz', 'mistrz@example.com', 'password123'),
+('AnkaSkakanka', 'anna.nowak@example.com', 'password123'),
+('Kowal99', 'kowal99@example.com', 'password123'),
+('KrólowaNauk', 'krolowa@example.com', 'password123'),
+('PiotrekPolujeNa100', 'piotr.mat@example.com', 'password123'),
+('ZdysiekX', 'zdysiek@example.com', 'password123'),
+('SzybkiZmienna', 'x.y.z@example.com', 'password123'),
+('DeltaUjemna', 'brak_rozwiazan@example.com', 'password123'),
+('Calka_z_Kawy', 'student2026@example.com', 'password123'),
+('PlanimetriaFan', 'trojkaty@example.com', 'password123'),
+('AsKombinatoryki', 'prawdopodobienstwo@example.com', 'password123'),
+('MaturzystaNaKrawedzi', 'ostatnia.szansa@example.com', 'password123');
 
-INSERT INTO user_roles (user_id, role_id) VALUES (
-    (SELECT id FROM users WHERE username = 'admin'),
-    (SELECT id FROM roles WHERE name = 'ADMIN')
-);
+-- ZMYŚLONY PROGRESS DLA UŻYTKOWNIKÓW
+INSERT INTO user_progress (user_id, field_id, score, total) VALUES
+-- MatmaMistrz
+((SELECT id FROM users WHERE username = 'MatmaMistrz'), 2, 8, 8),
+((SELECT id FROM users WHERE username = 'MatmaMistrz'), 3, 3, 3),
+((SELECT id FROM users WHERE username = 'MatmaMistrz'), 1, 12, 15),
+
+-- AnkaSkakanka
+((SELECT id FROM users WHERE username = 'AnkaSkakanka'), 2, 5, 8),
+((SELECT id FROM users WHERE username = 'AnkaSkakanka'), 6, 4, 7),
+
+-- Kowal99
+((SELECT id FROM users WHERE username = 'Kowal99'), 4, 1, 3),
+((SELECT id FROM users WHERE username = 'Kowal99'), 5, 0, 1),
+
+-- KrólowaNauk
+((SELECT id FROM users WHERE username = 'KrólowaNauk'), 2, 7, 8),
+((SELECT id FROM users WHERE username = 'KrólowaNauk'), 7, 3, 4),
+((SELECT id FROM users WHERE username = 'KrólowaNauk'), 1, 14, 15),
+
+-- PiotrekPolujeNa100
+((SELECT id FROM users WHERE username = 'PiotrekPolujeNa100'), 2, 8, 8),
+((SELECT id FROM users WHERE username = 'PiotrekPolujeNa100'), 3, 3, 3),
+((SELECT id FROM users WHERE username = 'PiotrekPolujeNa100'), 4, 3, 3),
+
+-- DeltaUjemna
+((SELECT id FROM users WHERE username = 'DeltaUjemna'), 2, 2, 8),
+((SELECT id FROM users WHERE username = 'DeltaUjemna'), 6, 1, 7),
+((SELECT id FROM users WHERE username = 'DeltaUjemna'), 1, 4, 15),
+
+-- SzybkiZmienna
+((SELECT id FROM users WHERE username = 'SzybkiZmienna'), 6, 6, 7),
+
+-- PlanimetriaFan
+((SELECT id FROM users WHERE username = 'PlanimetriaFan'), 9, 4, 4),
+
+-- MaturzystaNaKrawedzi
+((SELECT id FROM users WHERE username = 'MaturzystaNaKrawedzi'), 2, 4, 8),
+((SELECT id FROM users WHERE username = 'MaturzystaNaKrawedzi'), 1, 7, 15);

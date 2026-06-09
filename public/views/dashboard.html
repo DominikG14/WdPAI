@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title><?= $title ?? 'MaturaMat - Panel Użytkownika'; ?></title>
+    <style>
+        .dashboard-container { max-width: 900px; margin: 30px auto; padding: 20px; font-family: Arial, sans-serif; }
+        .dashboard-header { background: #007bff; color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .progress-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
+        .progress-table th, .progress-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        .progress-table th { background-color: #f8f9fa; color: #333; font-weight: bold; }
+        .progress-table tr:hover { background-color: #f1f1f1; }
+        .score-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .score-good { background: #d4edda; color: #155724; }
+        .score-bad { background: #f8d7da; color: #721c24; }
+        .no-data { text-align: center; padding: 30px; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+    <main class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Cześć! 👋</h1>
+            <p>Tutaj znajdziesz historię swoich podejść do zadań maturalnych i aktualne postępy.</p>
+        </div>
+
+        <h2>Twoje podejścia do testów</h2>
+
+        <?php if (empty($progress)): ?>
+            <div class="no-data">
+                <p>Nie rozwiązałeś jeszcze żadnego testu. Czas podszkolić matematykę!</p>
+                <a href="/index" style="color: #007bff; text-decoration: underline;">Przejdź do listy działów</a>
+            </div>
+        <?php else: ?>
+            <table class="progress-table">
+                <thead>
+                    <tr>
+                        <th>Dział matematyczny</th>
+                        <th>Wynik punktowy</th>
+                        <th>Skuteczność</th>
+                        <th>Data wykonania</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($progress as $row): ?>
+                        <?php 
+                            $percentage = $row['total'] > 0 ? round(($row['score'] / $row['total']) * 100) : 0; 
+                            $badgeClass = $percentage >= 50 ? 'score-good' : 'score-bad';
+                        ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($row['name']); ?></strong></td>
+                            <td><?= $row['score']; ?> z <?= $row['total']; ?></td>
+                            <td>
+                                <span class="score-badge <?= $badgeClass; ?>">
+                                    <?= $percentage; ?>%
+                                </span>
+                            </td>
+                            <td><?= date('d.m.Y, H:i', strtotime($row['solved_at'])); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </main>
+</body>
+</html>
