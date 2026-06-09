@@ -26,6 +26,11 @@ class Routing {
             "controller" => "SecurityController",
             "action" => "logout"
         ],
+        // DODAJ TĘ REGUŁĘ TUTAJ (zanim router zacznie szukać cyfr):
+        "exercises/save" => [
+            "controller" => "ExerciseController",
+            "action" => "save"
+        ],
         "exercises/field/(\d+)" => [
             "controller" => "ExerciseController",
             "action" => "field"

@@ -22,22 +22,22 @@ class UsersRepository extends Repository {
             $user['username'],
             $user['email'],
             $user['password'],
-            $user['full_name'],
+            null, // Usunięto błąd: kolumna full_name nie istnieje w bazie, przekazujemy null
             $user['id']
         );
     }
 
-    public function addUser(string $username, string $email, string $password, ?string $fullName) {
+    public function addUser(string $username, string $email, string $password) {
+        // Dopasowano INSERT dokładnie do kolumn w Twojej bazie danych
         $stmt = $this->database->connect()->prepare('
-            INSERT INTO users (username, email, password, full_name)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO users (username, email, password)
+            VALUES (?, ?, ?)
         ');
 
         $stmt->execute([
             $username,
             $email,
-            $password,
-            $fullName
+            $password
         ]);
     }
 
@@ -52,7 +52,7 @@ class UsersRepository extends Repository {
                 $data['username'],
                 $data['email'],
                 $data['password'],
-                $data['full_name'],
+                null, // Usunięto błąd: przekazujemy null zamiast nieistniejącego klucza full_name
                 $data['id']
             );
         }

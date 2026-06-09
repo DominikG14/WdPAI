@@ -25,7 +25,6 @@ class SecurityController extends AppController {
             return $this->render("login", ['messages' => ['Użytkownik nie istnieje!']]);
         }
 
-        // Używamy metody getPassword() z obiektu User [cite: 72]
         if (!password_verify($password, $user->getPassword())) {
             return $this->render("login", ['messages' => ['Błędne hasło!']]);
         }
@@ -34,8 +33,9 @@ class SecurityController extends AppController {
         $_SESSION['user_id'] = $user->getId();
         $_SESSION['user_email'] = $user->getEmail();
 
+        // ZMIANA: Przekierowanie na /index zamiast /dashboard
         $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/dashboard");
+        header("Location: {$url}/index");
         exit();
     }
 
@@ -48,9 +48,6 @@ class SecurityController extends AppController {
         $email = $_POST['email'] ?? '';
         $password = $_POST['password'] ?? '';
         $password2 = $_POST['password2'] ?? '';
-        $firstName = $_POST['firstName'] ?? '';
-        $lastName = $_POST['lastName'] ?? '';
-        $fullName = $firstName . " " . $lastName;
 
         if (empty($username) || empty($email) || empty($password)) {
             return $this->render("register", ['messages' => ['Uzupełnij pola!']]);
@@ -65,7 +62,7 @@ class SecurityController extends AppController {
         }
 
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $this->usersRepository->addUser($username, $email, $hashedPassword, $fullName);
+        $this->usersRepository->addUser($username, $email, $hashedPassword);
 
         return $this->render("login", ['messages' => ['Zarejestrowano pomyślnie!']]);
     }

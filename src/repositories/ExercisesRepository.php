@@ -19,4 +19,18 @@ class ExercisesRepository extends Repository {
         // Zwracamy czystą tablicę asocjacyjną
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function saveProgress(int $userId, int $fieldId, int $score, int $total): bool {
+    $stmt = $this->getPDO()->prepare('
+        INSERT INTO user_progress (user_id, field_id, score, total)
+        VALUES (:userId, :fieldId, :score, :total)
+    ');
+    
+    return $stmt->execute([
+        'userId' => $userId,
+        'fieldId' => $fieldId,
+        'score' => $score,
+        'total' => $total
+    ]);
+}
 }
