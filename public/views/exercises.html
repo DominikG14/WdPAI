@@ -11,6 +11,9 @@
         .options-group { display: flex; gap: 10px; margin-top: 15px; }
         .btn-option { padding: 12px 24px; border: 1px solid #007bff; background: #fff; color: #007bff; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-option:hover { background: #007bff; color: white; }
+        .quiz-actions { display: flex; justify-content: flex-end; margin-top: 18px; }
+        .btn-finish { padding: 10px 16px; border: 1px solid #dc3545; background: #fff; color: #dc3545; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-finish:hover { background: #dc3545; color: #fff; }
         .summary-card { display: none; background: #e9ecef; border: 2px solid #28a745; padding: 30px; border-radius: 8px; margin-top: 20px; text-align: center; }
         .progress-bar { font-size: 14px; color: #666; margin-bottom: 15px; font-weight: bold; }
         .back-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; }
@@ -55,6 +58,10 @@
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
+
+                        <div class="quiz-actions">
+                            <button type="button" class="btn-finish" onclick="finishQuizEarly()">Zako&#324;cz test</button>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -88,6 +95,7 @@
 
     <script>
         let currentIdx = 0;
+        let isChangingQuestion = false;
         const cards = document.querySelectorAll('.exercise-card');
         const totalCount = cards.length;
         
@@ -97,14 +105,27 @@
         updateProgress();
 
         function handleAnswerClick(button, val) {
+            if (isChangingQuestion) {
+                return;
+            }
+
             const currentCard = cards[currentIdx];
+
+            if (!currentCard || currentCard.hasAttribute('data-user-answer')) {
+                return;
+            }
+
+            isChangingQuestion = true;
             currentCard.setAttribute('data-user-answer', val);
 
             button.style.background = "#0056b3";
             button.style.color = "white";
+            currentCard.querySelectorAll('.btn-option').forEach((optionButton) => {
+                optionButton.disabled = true;
+            });
 
             setTimeout(() => {
-                currentCard.classList.remove('active');
+                cards.forEach((card) => card.classList.remove('active'));
                 currentIdx++;
 
                 if (currentIdx >= totalCount) {
@@ -112,6 +133,7 @@
                 } else {
                     cards[currentIdx].classList.add('active');
                     updateProgress();
+                    isChangingQuestion = false;
                 }
             }, 200);
         }
@@ -123,12 +145,26 @@
             }
         }
 
-        function checkQuiz() {
+        function finishQuizEarly() {
+            if (isChangingQuestion) {
+                return;
+            }
+
+            if (confirm('Czy na pewno chcesz zakonczyc test w tym miejscu?')) {
+                checkQuiz(true);
+            }
+        }
+
+        function checkQuiz(onlyAnswered = false) {
             let correctCount = 0;
             const reviewContainer = document.getElementById('review-container');
             reviewContainer.innerHTML = ''; 
+            const checkedCards = onlyAnswered
+                ? Array.from(cards).filter((card) => card.hasAttribute('data-user-answer'))
+                : Array.from(cards);
+            const checkedTotal = checkedCards.length;
 
-            cards.forEach((card, index) => {
+            checkedCards.forEach((card, index) => {
                 const correctAnswer = card.getAttribute('data-correct').trim().toUpperCase();
                 const userAnswer = (card.getAttribute('data-user-answer') || '').trim().toUpperCase();
                 const imgSrc = card.getAttribute('data-img');
@@ -150,7 +186,7 @@
             });
 
             document.getElementById('quiz-section').style.display = 'none';
-            document.getElementById('score-rating').innerText = `${correctCount} / ${totalCount}`;
+            document.getElementById('score-rating').innerText = `${correctCount} / ${checkedTotal}`;
 
             // Zarządzanie widokiem w zależności od statusu zalogowania
             if (isLoggedIn) {
@@ -159,14 +195,14 @@
                 document.getElementById('save-status').innerText = "Zapisywanie postępów w bazie danych...";
                 
                 // Fetch API – wysyłanie wyniku do bazy danych
-                if (currentFieldId > 0) {
+                if (currentFieldId > 0 && checkedTotal > 0) {
                     fetch('/exercises/save', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             field_id: currentFieldId,
                             score: correctCount,
-                            total: totalCount
+                            total: checkedTotal
                         })
                     })
                     .then(res => res.json())
@@ -182,6 +218,9 @@
                     .catch(() => {
                         document.getElementById('save-status').innerText = "🔴 Błąd połączenia. Wynik nie został zapisany.";
                     });
+                } else if (checkedTotal === 0) {
+                    document.getElementById('save-status').innerText = "Nie zapisano postepu, bo nie udzielono zadnej odpowiedzi.";
+                    document.getElementById('save-status').style.color = "#dc3545";
                 }
             } else {
                 // Dla niezalogowanego ukrywamy podgląd, a pokazujemy okienko zachęty (login-box)

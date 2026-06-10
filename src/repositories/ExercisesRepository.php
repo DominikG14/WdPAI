@@ -10,7 +10,7 @@ class ExercisesRepository extends Repository {
             SELECT id, image_url, type, right_answer 
             FROM exercises 
             WHERE field_id = :fieldId
-            ORDER BY id ASC
+            ORDER BY RANDOM()
         ';
 
         if ($limit !== null && $limit > 0) {
