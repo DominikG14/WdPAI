@@ -140,7 +140,13 @@
         <section class="random-section">
             <h2>Masz mało czasu?</h2>
             <p>Wylosuj zadania z różnych działów i sprawdź swoją ogólną wiedzę maturalną.</p>
-            <a href="/exercises/random" class="cta-button" style="background-color: #28a745;">Rozwiąż losowe zadania</a>
+            <form id="random-exercises-form" class="task-count-form" style="justify-content: center; gap: 10px;">
+                <label class="task-count-field" for="random-task-count-input">
+                    Liczba zadań
+                    <input type="number" id="random-task-count-input" min="1" max="50" value="10" required>
+                </label>
+                <button type="submit" class="cta-button" style="background-color: #28a745; border: none;">Rozwiąż losowe zadania</button>
+            </form>
         </section>
 
         <section class="fields-section">
@@ -200,6 +206,8 @@
         const taskCountInput = document.getElementById('task-count-input');
         const quickCounts = document.getElementById('quick-counts');
         const taskCountForm = document.getElementById('task-count-form');
+        const randomTaskCountInput = document.getElementById('random-task-count-input');
+        const randomExercisesForm = document.getElementById('random-exercises-form');
         const quickCountValues = [5, 10, 15, 20, 25, 30];
 
         fieldCards.forEach((card) => {
@@ -277,6 +285,18 @@
 
             selectedCount = Math.max(1, Math.min(selectedCount, maxCount));
             window.location.href = `/exercises/field/${fieldId}?limit=${selectedCount}`;
+        });
+
+        randomExercisesForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            let selectedCount = parseInt(randomTaskCountInput.value, 10);
+            if (Number.isNaN(selectedCount) || selectedCount < 1) {
+                selectedCount = 10;
+            }
+
+            selectedCount = Math.min(selectedCount, 50);
+            window.location.href = `/exercises/random?limit=${selectedCount}`;
         });
     </script>
 </body>

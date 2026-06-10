@@ -52,6 +52,10 @@ class Routing {
             "controller" => "ExerciseController",
             "action" => "save"
         ],
+        "exercises/random" => [
+            "controller" => "ExerciseController",
+            "action" => "random"
+        ],
         "exercises/field/(\d+)" => [
             "controller" => "ExerciseController",
             "action" => "field"

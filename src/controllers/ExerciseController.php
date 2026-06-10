@@ -2,6 +2,7 @@
 
 require_once 'AppController.php';
 require_once __DIR__ . '/../repositories/ExercisesRepository.php';
+require_once __DIR__ . '/../repositories/FieldsRepository.php';
 
 class ExerciseController extends AppController {
 
@@ -20,6 +21,28 @@ class ExerciseController extends AppController {
             'exercises' => $exercises,
             'fieldId' => (int)$id,
             'isLoggedIn' => isset($_SESSION['user_id']), // Przekazujemy stan zalogowania do widoku
+        ]);
+    }
+
+    public function random() {
+        $exercisesRepository = new ExercisesRepository();
+        $fieldsRepository = new FieldsRepository();
+
+        $taskCount = isset($_GET['limit']) ? (int)$_GET['limit'] : null;
+        $taskCount = $taskCount !== null && $taskCount > 0 ? $taskCount : 10;
+        $exercises = $exercisesRepository->getRandomExercises($taskCount);
+
+        $mixedField = $fieldsRepository->getFieldByNumber('0');
+        $fieldId = $mixedField ? (int)$mixedField['id'] : 0;
+
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        return $this->render('exercises', [
+            'exercises' => $exercises,
+            'fieldId' => $fieldId,
+            'isLoggedIn' => isset($_SESSION['user_id']),
         ]);
     }
 

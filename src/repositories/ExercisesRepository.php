@@ -30,6 +30,21 @@ class ExercisesRepository extends Repository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getRandomExercises(int $limit = 10): array {
+        $sql = '
+            SELECT id, image_url, type, right_answer
+            FROM exercises
+            ORDER BY RANDOM()
+            LIMIT :limit
+        ';
+
+        $stmt = $this->getPDO()->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function saveProgress(int $userId, int $fieldId, int $score, int $total): bool {
     $stmt = $this->getPDO()->prepare('
         INSERT INTO user_progress (user_id, field_id, score, total)

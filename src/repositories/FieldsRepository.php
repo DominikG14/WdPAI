@@ -21,4 +21,18 @@ class FieldsRepository extends Repository {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getFieldByNumber(string $number): ?array {
+        $stmt = $this->getPDO()->prepare('
+            SELECT id, number, name
+            FROM fields
+            WHERE number = :number
+            LIMIT 1
+        ');
+        $stmt->bindParam(':number', $number, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $field = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $field !== false ? $field : null;
+    }
 }
