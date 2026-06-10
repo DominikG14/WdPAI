@@ -1,12 +1,13 @@
 <?php
 
-require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/DashboardController.php';
+require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/ExerciseController.php';
-require_once 'src/controllers/AdminController.php';
+require_once 'src/controllers/AdminController.php'; // Zaimportowany kontroler admina
 
 class Routing {
-public static $routes = [
+
+    public static $routes = [
         "login" => [
             "controller" => "SecurityController",
             "action" => "login"
@@ -27,7 +28,10 @@ public static $routes = [
             "controller" => "AdminController",
             "action" => "users"
         ],
-        // NOWA REGUŁA: Podgląd postępów danego użytkownika
+        "admin/users/search" => [
+            "controller" => "AdminController",
+            "action" => "searchUsers"
+        ],
         "admin/users/progress/(\d+)" => [
             "controller" => "AdminController",
             "action" => "userProgress"
@@ -53,32 +57,32 @@ public static $routes = [
             "action" => "field"
         ]
     ];
-    
-    private static $instances = [];
 
     public static function run(string $path) {
+        // Zabezpieczenie: Odcinamy ewentualny ukośnik z początku ścieżki (np. /search -> search)
+        $path = ltrim($path, '/');
+
+        // Wyciągamy czysty adres bez parametrów zapytania query string (?param=val)
+        $action = explode("?", $path)[0];
+
         foreach (self::$routes as $url => $config) {
             $pattern = "#^" . $url . "$#";
 
-            if (preg_match($pattern, $path, $matches)) {
-                $controllerName = $config["controller"];
-                $action = $config["action"];
+            if (preg_match($pattern, $action, $matches)) {
+                $controllerName = $config['controller'];
+                $actionName = $config['action'];
 
-                if (!isset(self::$instances[$controllerName])) {
-                    self::$instances[$controllerName] = new $controllerName();
-                }
+                $controller = new $controllerName();
                 
-                $controllerObj = self::$instances[$controllerName];
-
-                // Dzięki nawiasom w "exercises/field/(\d+)", tutaj pod $matches[1] wskoczy ID działu (np. 1, 2, 3...)
-                $id = $matches[1] ?? null;
-
-                $controllerObj->$action($id);
+                // Przekazujemy ewentualny złapany z regexa identyfikator (\d+) jako argument do metody
+                $argument = isset($matches[1]) ? $matches[1] : null;
+                $controller->$actionName($argument);
                 return;
             }
         }
 
-        http_response_code(404);
+        // Jeśli żadna ścieżka nie pasuje, wyświetlamy błąd 404
         include 'public/views/404.html';
+        exit();
     }
 }

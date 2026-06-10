@@ -85,4 +85,38 @@ class UsersRepository extends Repository {
         $stmt->execute();
         return $stmt->fetchColumn() ?: null;
     }
+
+    public function searchUsers(string $search): array {
+        $search = trim($search);
+
+        if ($search === '') {
+            return $this->getUsers();
+        }
+
+        $stmt = $this->database->connect()->prepare('
+            SELECT * FROM users
+            WHERE LOWER(username) LIKE LOWER(:search)
+               OR LOWER(email) LIKE LOWER(:search)
+            ORDER BY username ASC
+        ');
+
+        $searchPattern = '%' . $search . '%';
+        $stmt->bindParam(':search', $searchPattern, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $usersData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = [];
+
+        foreach ($usersData as $data) {
+            $result[] = new User(
+                $data['username'],
+                $data['email'],
+                $data['password'],
+                null,
+                $data['id']
+            );
+        }
+
+        return $result;
+    }
 }

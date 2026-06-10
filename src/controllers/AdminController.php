@@ -66,4 +66,37 @@ class AdminController extends AppController {
         header("Location: {$url}/admin/users");
         exit();
     }
+
+    public function searchUsers() {
+        $this->checkAdmin();
+
+        if (!$this->isPost()) {
+            http_response_code(405);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Method not allowed']);
+            exit();
+        }
+
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $payload = [];
+
+        if (stripos($contentType, 'application/json') !== false) {
+            $payload = json_decode(file_get_contents('php://input'), true) ?: [];
+        } else {
+            $payload = $_POST;
+        }
+
+        $search = trim($payload['search'] ?? '');
+        $users = $this->usersRepository->searchUsers($search);
+
+        header('Content-Type: application/json');
+        echo json_encode(array_map(function (User $user) {
+            return [
+                'id' => $user->getId(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail()
+            ];
+        }, $users));
+        exit();
+    }
 }

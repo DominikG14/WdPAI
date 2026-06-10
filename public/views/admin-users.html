@@ -3,6 +3,7 @@
 <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
     <title><?= $title ?? 'MaturaMat - Admin'; ?></title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .admin-container { 
             max-width: 1000px; 
@@ -16,6 +17,16 @@
             padding: 20px; 
             border-radius: 8px; 
             margin-bottom: 30px; 
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 20px 0;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
         }
         .users-table { 
             width: 100%; 
@@ -89,6 +100,8 @@
 
         <h2>Zarejestrowani użytkownicy</h2>
 
+        <input type="text" id="search-input" class="search-box" placeholder="Zacznij pisać aby wyszukać po loginie lub emailu...">
+
         <table class="users-table">
             <thead>
                 <tr>
@@ -98,7 +111,7 @@
                     <th>Akcje</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="users-table-body">
                 <?php foreach ($users as $user): ?>
                     <tr>
                         <td><?= $user->getId(); ?></td>
@@ -114,7 +127,7 @@
                             <?php else: ?>
                                 <a href="/admin/users/delete/<?= $user->getId(); ?>" 
                                    class="btn-delete" 
-                                   onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika wraz z jego wszystkimi postępami?')">
+                                   onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
                                    <i class="fa-solid fa-trash"></i> Usuń konto
                                 </a>
                             <?php endif; ?>
@@ -124,5 +137,72 @@
             </tbody>
         </table>
     </main>
+
+    <script>
+        $(document).ready(function() {
+            const currentUserId = <?= json_encode($_SESSION['user_id']); ?>;
+
+            $('#search-input').on('input', function() {
+                const searchValue = $(this).val();
+
+                $.ajax({
+                    url: '/admin/users/search',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ search: searchValue }),
+                    dataType: 'json',
+                    success: function(users) {
+                        const $tableBody = $('#users-table-body');
+                        $tableBody.empty(); // Czyszczenie starych wierszy tabeli
+
+                        if (users.length === 0) {
+                            $tableBody.append('<tr><td colspan="4" style="text-align:center; color: #666; font-style: italic;">Nie znaleziono dopasowań.</td></tr>');
+                            return;
+                        }
+
+                        // Renderowanie nowych wierszy z danych JSON
+                        users.forEach(function(user) {
+                            let actionButton = '';
+                            
+                            if (parseInt(user.id) === parseInt(currentUserId)) {
+                                actionButton = '<span class="badge-self">To Ty</span>';
+                            } else {
+                                actionButton = `
+                                    <a href="/admin/users/delete/${user.id}" 
+                                       class="btn-delete" 
+                                       onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
+                                       <i class="fa-solid fa-trash"></i> Usuń konto
+                                    </a>
+                                `;
+                            }
+
+                            // Filtrowanie przed atakami XSS
+                            const safeUsername = $('<div>').text(user.username).html();
+                            const safeEmail = $('<div>').text(user.email).html();
+
+                            const row = `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td><strong>${safeUsername}</strong></td>
+                                    <td>${safeEmail}</td>
+                                    <td>
+                                        <a href="/admin/users/progress/${user.id}" class="btn-progress">
+                                            <i class="fa-solid fa-eye"></i> Postępy
+                                        </a>
+                                        ${actionButton}
+                                    </td>
+                                </tr>
+                            `;
+                            $tableBody.append(row);
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Błąd AJAX: ", error);
+                        console.error("Status kodu: ", xhr.status);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
