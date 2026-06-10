@@ -32,7 +32,8 @@ class SecurityController extends AppController {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user->getId();
         $_SESSION['user_email'] = $user->getEmail();
-
+        $_SESSION['is_admin'] = $this->usersRepository->isAdmin($user->getId());
+        
         // ZMIANA: Przekierowanie na /index zamiast /dashboard
         $url = "http://$_SERVER[HTTP_HOST]";
         header("Location: {$url}/index");

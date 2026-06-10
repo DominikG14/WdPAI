@@ -8,6 +8,12 @@
       </li>
 
       <?php if (isset($_SESSION['user_id'])): ?>
+        <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true): ?>
+          <li>
+            <a href="/admin/users" style="color: #ffc107;"><i class="fa-solid fa-user-shield"></i> PANEL ADMINA</a>
+          </li>
+        <?php endif; ?>
+
         <li>
           <a href="/dashboard"><i class="fa-solid fa-chart-line"></i> MOJE POSTĘPY</a>
         </li>

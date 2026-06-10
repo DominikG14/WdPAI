@@ -58,4 +58,24 @@ class UsersRepository extends Repository {
         }
         return $result;
     }
+
+    public function isAdmin(int $userId): bool {
+        $stmt = $this->database->connect()->prepare('
+            SELECT COUNT(*) FROM user_roles ur
+            JOIN roles r ON ur.role_id = r.id
+            WHERE ur.user_id = :userId AND r.name = \'ADMIN\'
+        ');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        return $stmt->fetchColumn() > 0;
+    }
+
+    public function deleteUser(int $id): bool {
+        $stmt = $this->database->connect()->prepare('
+            DELETE FROM users WHERE id = :id
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }

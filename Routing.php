@@ -3,6 +3,7 @@
 require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/DashboardController.php';
 require_once 'src/controllers/ExerciseController.php';
+require_once 'src/controllers/AdminController.php';
 
 class Routing {
 public static $routes = [
@@ -18,10 +19,18 @@ public static $routes = [
             "controller" => "DashboardController",
             "action" => "index"
         ],
-        // DODAJEMY TĘ LINIJKĘ:
         "dashboard" => [
             "controller" => "DashboardController",
             "action" => "dashboard"
+        ],
+        // NOWE ŚCIEŻKI DLA ADMINA:
+        "admin/users" => [
+            "controller" => "AdminController",
+            "action" => "users"
+        ],
+        "admin/users/delete/(\d+)" => [
+            "controller" => "AdminController",
+            "action" => "deleteUser"
         ],
         "register" => [
             "controller" => "SecurityController",

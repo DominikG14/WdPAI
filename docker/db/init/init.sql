@@ -45,7 +45,7 @@ CREATE TABLE user_progress (
     solved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- JEDYNA ROLA W SYSTEMIE - DLA POTENCJALNYCH ADMINISTRATORÓW W PRZYSZŁOŚCI
+-- JEDYNA ROLA W SYSTEMIE - DLA ADMINISTRATORA
 INSERT INTO roles (name) VALUES 
 ('ADMIN');
 
@@ -133,6 +133,16 @@ INSERT INTO users (username, email, password) VALUES
 ('PlanimetriaFan', 'trojkaty@example.com', 'password123'),
 ('AsKombinatoryki', 'prawdopodobienstwo@example.com', 'password123'),
 ('MaturzystaNaKrawedzi', 'ostatnia.szansa@example.com', 'password123');
+
+-- NOWY ELEMENT: DODANIE ADMINISTRATORA (Z podanym przez Ciebie hashem)
+INSERT INTO users (username, email, password) VALUES 
+('admin', 'admin@example.com', '$2y$10$Iuzxt9Zlcj3.5oC9tGmpYO/tCh5Yv/Ykqnc6KIyKTD0YFM73jI8o.');
+
+-- POWIĄZANIE ADMINISTRATORA Z ROLĄ 'ADMIN'
+INSERT INTO user_roles (user_id, role_id) VALUES (
+    (SELECT id FROM users WHERE username = 'admin'),
+    (SELECT id FROM roles WHERE name = 'ADMIN')
+);
 
 -- ZMYŚLONY PROGRESS DLA UŻYTKOWNIKÓW
 INSERT INTO user_progress (user_id, field_id, score, total) VALUES
