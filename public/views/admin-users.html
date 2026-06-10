@@ -4,15 +4,78 @@
     <?php include __DIR__ . '/partials/head.html'; ?>
     <title><?= $title ?? 'MaturaMat - Admin'; ?></title>
     <style>
-        .admin-container { max-width: 1000px; margin: 30px auto; padding: 20px; font-family: Arial, sans-serif; }
-        .admin-header { background: #212529; color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .users-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
-        .users-table th, .users-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        .users-table th { background-color: #f1f3f5; color: #495057; font-weight: bold; }
-        .users-table tr:hover { background-color: #f8f9fa; }
-        .btn-delete { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 13px; }
-        .btn-delete:hover { background: #bd2130; }
-        .badge-self { background: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .admin-container { 
+            max-width: 1000px; 
+            margin: 30px auto; 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+        }
+        .admin-header { 
+            background: #212529; 
+            color: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 30px; 
+        }
+        .users-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+            background: #fff; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            border-radius: 6px; 
+            overflow: hidden; 
+        }
+        .users-table th, .users-table td { 
+            padding: 12px 15px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+        .users-table th { 
+            background-color: #f1f3f5; 
+            color: #495057; 
+            font-weight: bold; 
+        }
+        .users-table tr:hover { 
+            background-color: #f8f9fa; 
+        }
+        .btn-progress {
+            background: #17a2b8; 
+            color: white; 
+            padding: 6px 12px; 
+            border: none;
+            border-radius: 4px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 13px; 
+            margin-right: 5px;
+            display: inline-block;
+        }
+        .btn-progress:hover {
+            background: #138496;
+        }
+        .btn-delete { 
+            background: #dc3545; 
+            color: white; 
+            padding: 6px 12px; 
+            border: none; 
+            border-radius: 4px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 13px; 
+            display: inline-block;
+        }
+        .btn-delete:hover { 
+            background: #bd2130; 
+        }
+        .badge-self { 
+            background: #6c757d; 
+            color: white; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-size: 12px; 
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -42,13 +105,17 @@
                         <td><strong><?= htmlspecialchars($user->getUsername()); ?></strong></td>
                         <td><?= htmlspecialchars($user->getEmail()); ?></td>
                         <td>
+                            <a href="/admin/users/progress/<?= $user->getId(); ?>" class="btn-progress">
+                                <i class="fa-solid fa-eye"></i> Postępy
+                            </a>
+
                             <?php if ($user->getId() === $_SESSION['user_id']): ?>
                                 <span class="badge-self">To Ty</span>
                             <?php else: ?>
                                 <a href="/admin/users/delete/<?= $user->getId(); ?>" 
                                    class="btn-delete" 
                                    onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika wraz z jego wszystkimi postępami?')">
-                                   Usuń konto
+                                   <i class="fa-solid fa-trash"></i> Usuń konto
                                 </a>
                             <?php endif; ?>
                         </td>

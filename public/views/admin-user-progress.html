@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title><?= $title; ?></title>
+    <style>
+        .admin-container { max-width: 1000px; margin: 30px auto; padding: 20px; font-family: Arial, sans-serif; }
+        .admin-header { background: #495057; color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .btn-back { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
+        .btn-back:hover { text-decoration: underline; }
+        .progress-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
+        .progress-table th, .progress-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        .progress-table th { background-color: #f1f3f5; color: #495057; font-weight: bold; }
+        .progress-table tr:hover { background-color: #f8f9fa; }
+        .score-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .score-good { background: #d4edda; color: #155724; }
+        .score-bad { background: #f8d7da; color: #721c24; }
+        .no-data { text-align: center; padding: 30px; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+    <main class="admin-container">
+        <a href="/admin/users" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Powrót do listy użytkowników</a>
+
+        <div class="admin-header">
+            <h1>📊 Historia podejść: <?= htmlspecialchars($targetUsername); ?></h1>
+            <p>Podgląd statystyk i rozwiązanych zestawów zadań przez tego użytkownika.</p>
+        </div>
+
+        <?php if (empty($progress)): ?>
+            <div class="no-data">
+                <p>Ten użytkownik nie rozwiązał jeszcze żadnego testu.</p>
+            </div>
+        <?php else: ?>
+            <table class="progress-table">
+                <thead>
+                    <tr>
+                        <th>Dział matematyczny</th>
+                        <th>Wynik</th>
+                        <th>Skuteczność</th>
+                        <th>Data podejścia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($progress as $row): ?>
+                        <?php 
+                            $percentage = $row['total'] > 0 ? round(($row['score'] / $row['total']) * 100) : 0; 
+                            $badgeClass = $percentage >= 50 ? 'score-good' : 'score-bad';
+                        ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($row['name']); ?></strong></td>
+                            <td><?= $row['score']; ?> / <?= $row['total']; ?></td>
+                            <td>
+                                <span class="score-badge <?= $badgeClass; ?>">
+                                    <?= $percentage; ?>%
+                                </span>
+                            </td>
+                            <td><?= date('d.m.Y, H:i', strtotime($row['solved_at'])); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+    </main>
+</body>
+</html>

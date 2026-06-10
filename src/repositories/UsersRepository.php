@@ -78,4 +78,11 @@ class UsersRepository extends Repository {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function getUsernameById(int $id): ?string {
+        $stmt = $this->database->connect()->prepare('SELECT username FROM users WHERE id = :id');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn() ?: null;
+    }
 }

@@ -23,10 +23,14 @@ public static $routes = [
             "controller" => "DashboardController",
             "action" => "dashboard"
         ],
-        // NOWE ŚCIEŻKI DLA ADMINA:
         "admin/users" => [
             "controller" => "AdminController",
             "action" => "users"
+        ],
+        // NOWA REGUŁA: Podgląd postępów danego użytkownika
+        "admin/users/progress/(\d+)" => [
+            "controller" => "AdminController",
+            "action" => "userProgress"
         ],
         "admin/users/delete/(\d+)" => [
             "controller" => "AdminController",
