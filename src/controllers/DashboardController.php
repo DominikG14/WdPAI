@@ -31,10 +31,12 @@ class DashboardController extends AppController {
         $progressRepository = new ProgressRepository();
         // Pobieramy historię wszystkich podejść zalogowanego użytkownika
         $progress = $progressRepository->getUserProgress($_SESSION['user_id']);
+        $progressByField = $progressRepository->getUserProgressByField($_SESSION['user_id']);
 
         return $this->render("dashboard", [
             "title" => "Twój Panel - MaturaMat",
-            "progress" => $progress
+            "progress" => $progress,
+            "progressByField" => $progressByField
         ]);
     }
 }

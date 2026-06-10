@@ -4,16 +4,26 @@
     <?php include __DIR__ . '/partials/head.html'; ?>
     <title><?= $title ?? 'MaturaMat - Panel Użytkownika'; ?></title>
     <style>
-        .dashboard-container { max-width: 900px; margin: 30px auto; padding: 20px; font-family: Arial, sans-serif; }
-        .dashboard-header { background: #007bff; color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .progress-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
-        .progress-table th, .progress-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        .dashboard-container { max-width: 1200px; margin: 18px auto; padding: 14px; font-family: Arial, sans-serif; }
+        .dashboard-header { background: #007bff; color: white; padding: 14px 18px; border-radius: 8px; margin-bottom: 18px; }
+        .dashboard-header h1 { margin: 0 0 6px; font-size: 24px; }
+        .dashboard-header p { margin: 0; }
+        .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr); gap: 18px; align-items: start; }
+        .table-wrap { max-height: 62vh; overflow: auto; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff; }
+        .progress-table { width: 100%; border-collapse: collapse; background: #fff; }
+        .progress-table th, .progress-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
         .progress-table th { background-color: #f8f9fa; color: #333; font-weight: bold; }
         .progress-table tr:hover { background-color: #f1f1f1; }
-        .score-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 14px; }
+        .score-badge { display: inline-block; min-width: 42px; padding: 4px 8px; border-radius: 20px; font-weight: bold; font-size: 13px; text-align: center; }
         .score-good { background: #d4edda; color: #155724; }
         .score-bad { background: #f8d7da; color: #721c24; }
         .no-data { text-align: center; padding: 30px; color: #666; font-style: italic; }
+        .section-block h2 { margin: 0 0 10px; font-size: 19px; }
+        .field-name { max-width: 260px; }
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .table-wrap { max-height: none; }
+        }
     </style>
 </head>
 <body>
@@ -33,6 +43,46 @@
                 <a href="/index" style="color: #007bff; text-decoration: underline;">Przejdź do listy działów</a>
             </div>
         <?php else: ?>
+            <section class="section-block">
+                <h2>Podsumowanie wedlug dzialow</h2>
+
+                <table class="progress-table">
+                    <thead>
+                        <tr>
+                            <th>Dzial</th>
+                            <th>Podejscia</th>
+                            <th>Punkty razem</th>
+                            <th>Skutecznosc</th>
+                            <th>Ostatnie podejscie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($progressByField as $row): ?>
+                            <?php
+                                $scoreSum = (int)$row['score_sum'];
+                                $totalSum = (int)$row['total_sum'];
+                                $percentage = $totalSum > 0 ? round(($scoreSum / $totalSum) * 100) : 0;
+                                $badgeClass = $percentage >= 50 ? 'score-good' : 'score-bad';
+                            ?>
+                            <tr>
+                                <td>
+                                    <strong>Dzial <?= htmlspecialchars($row['number']); ?> - <?= htmlspecialchars($row['name']); ?></strong>
+                                </td>
+                                <td><?= (int)$row['attempts_count']; ?></td>
+                                <td><?= $scoreSum; ?> z <?= $totalSum; ?></td>
+                                <td>
+                                    <span class="score-badge <?= $badgeClass; ?>">
+                                        <?= $percentage; ?>%
+                                    </span>
+                                </td>
+                                <td><?= $row['last_solved_at'] ? date('d.m.Y, H:i', strtotime($row['last_solved_at'])) : '-'; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section-block">
             <table class="progress-table">
                 <thead>
                     <tr>
@@ -61,6 +111,7 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </section>
         <?php endif; ?>
     </main>
 </body>

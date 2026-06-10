@@ -17,4 +17,27 @@ class ProgressRepository extends Repository {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getUserProgressByField(int $userId): array {
+        $stmt = $this->database->connect()->prepare('
+            SELECT
+                f.number,
+                f.name,
+                COUNT(p.id) AS attempts_count,
+                COALESCE(SUM(p.score), 0) AS score_sum,
+                COALESCE(SUM(p.total), 0) AS total_sum,
+                MAX(p.solved_at) AS last_solved_at
+            FROM fields f
+            LEFT JOIN user_progress p ON p.field_id = f.id AND p.user_id = :userId
+            WHERE f.number <> :mixedFieldNumber
+            GROUP BY f.id, f.number, f.name
+            ORDER BY f.id ASC
+        ');
+        $mixedFieldNumber = '0';
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':mixedFieldNumber', $mixedFieldNumber, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
