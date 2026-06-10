@@ -40,6 +40,10 @@
             border-radius: 8px;
             text-decoration: none;
             color: #333;
+            background: #fff;
+            cursor: pointer;
+            font: inherit;
+            text-align: left;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         .field-card:hover {
@@ -47,11 +51,70 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border-color: #007bff;
         }
+        .field-card:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+        }
         .field-number {
             font-weight: bold;
             color: #007bff;
             display: block;
             margin-bottom: 5px;
+        }
+        .field-count {
+            color: #666;
+            display: block;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .task-count-panel {
+            display: none;
+            margin-top: 24px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .task-count-panel.active {
+            display: block;
+        }
+        .task-count-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .task-count-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .task-count-field input {
+            width: 160px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .quick-counts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .quick-count {
+            padding: 8px 12px;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            background: #fff;
+            color: #007bff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .quick-count:hover {
+            background: #007bff;
+            color: #fff;
         }
     </style>
 </head>
@@ -87,10 +150,19 @@
             <div class="fields-grid">
                 <?php if(isset($fields) && !empty($fields)): ?>
                     <?php foreach($fields as $field): ?>
-                        <a href="/exercises/field/<?= $field['id']; ?>" class="field-card">
+                        <?php $exerciseCount = (int)($field['exercises_count'] ?? 0); ?>
+                        <button
+                            type="button"
+                            class="field-card"
+                            data-field-id="<?= $field['id']; ?>"
+                            data-field-name="<?= htmlspecialchars($field['name']); ?>"
+                            data-max-count="<?= $exerciseCount; ?>"
+                            <?= $exerciseCount === 0 ? 'disabled' : ''; ?>
+                        >
                             <span class="field-number">Dział <?= htmlspecialchars($field['number']); ?></span>
                             <h3><?= htmlspecialchars($field['name']); ?></h3>
-                        </a>
+                            <span class="field-count">Dostepne zadania: <?= $exerciseCount; ?></span>
+                        </button>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <p style="color: red; font-weight: bold;">
@@ -98,8 +170,114 @@
                     </p>
                 <?php endif; ?>
             </div>
+
+            <div id="task-count-panel" class="task-count-panel">
+                <h3 id="selected-field-title">Wybierz liczbe zadan</h3>
+                <p id="selected-field-limit">Maksymalna liczba zadan w tym dziale: 0</p>
+
+                <form id="task-count-form" class="task-count-form">
+                    <input type="hidden" id="selected-field-id">
+
+                    <label class="task-count-field" for="task-count-input">
+                        Liczba zadan
+                        <input type="number" id="task-count-input" min="1" value="5" required>
+                    </label>
+
+                    <button type="submit" class="cta-button" style="border: none; margin-top: 0;">Rozpocznij</button>
+                </form>
+
+                <div id="quick-counts" class="quick-counts" aria-label="Szybki wybor liczby zadan"></div>
+            </div>
         </section>
 
     </main>
+    <script>
+        const fieldCards = document.querySelectorAll('.field-card');
+        const taskCountPanel = document.getElementById('task-count-panel');
+        const selectedFieldTitle = document.getElementById('selected-field-title');
+        const selectedFieldLimit = document.getElementById('selected-field-limit');
+        const selectedFieldId = document.getElementById('selected-field-id');
+        const taskCountInput = document.getElementById('task-count-input');
+        const quickCounts = document.getElementById('quick-counts');
+        const taskCountForm = document.getElementById('task-count-form');
+        const quickCountValues = [5, 10, 15, 20, 25, 30];
+
+        fieldCards.forEach((card) => {
+            const maxCount = parseInt(card.dataset.maxCount, 10);
+            const countLabel = card.querySelector('.field-count');
+
+            if (countLabel) {
+                countLabel.innerText = `Dost\u0119pne zadania: ${maxCount}`;
+            }
+
+            card.addEventListener('click', () => {
+                const fieldId = card.dataset.fieldId;
+                const fieldName = card.dataset.fieldName;
+                const maxCount = parseInt(card.dataset.maxCount, 10);
+                const initialCount = Math.min(5, maxCount);
+
+                selectedFieldId.value = fieldId;
+                taskCountInput.max = maxCount;
+                taskCountInput.value = initialCount;
+                selectedFieldTitle.innerText = `Dzia\u0142: ${fieldName}`;
+                selectedFieldLimit.innerText = `Maksymalna liczba zada\u0144 w tym dziale: ${maxCount}`;
+
+                quickCounts.innerHTML = '';
+                quickCountValues
+                    .filter((count) => count <= maxCount)
+                    .forEach((count) => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'quick-count';
+                        button.innerText = count;
+                        button.addEventListener('click', () => {
+                            taskCountInput.value = count;
+                        });
+                        quickCounts.appendChild(button);
+                    });
+
+                if (maxCount > 0 && !quickCountValues.includes(maxCount)) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'quick-count';
+                    button.innerText = maxCount;
+                    button.addEventListener('click', () => {
+                        taskCountInput.value = maxCount;
+                    });
+                    quickCounts.appendChild(button);
+                }
+
+                if (!quickCounts.children.length) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'quick-count';
+                    button.innerText = maxCount;
+                    button.addEventListener('click', () => {
+                        taskCountInput.value = maxCount;
+                    });
+                    quickCounts.appendChild(button);
+                }
+
+                taskCountPanel.classList.add('active');
+                taskCountPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                taskCountInput.focus();
+            });
+        });
+
+        taskCountForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const fieldId = selectedFieldId.value;
+            const maxCount = parseInt(taskCountInput.max, 10);
+            let selectedCount = parseInt(taskCountInput.value, 10);
+
+            if (!fieldId || Number.isNaN(selectedCount)) {
+                return;
+            }
+
+            selectedCount = Math.max(1, Math.min(selectedCount, maxCount));
+            window.location.href = `/exercises/field/${fieldId}?limit=${selectedCount}`;
+        });
+    </script>
 </body>
 </html>

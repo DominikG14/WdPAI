@@ -6,10 +6,16 @@ class FieldsRepository extends Repository {
 
     public function getFields(): array {
         $stmt = $this->getPDO()->prepare('
-            SELECT id, number, name 
-            FROM fields 
-            ORDER BY id ASC
+            SELECT f.id, f.number, f.name, COUNT(e.id) AS exercises_count
+            FROM fields f
+            LEFT JOIN exercises e ON e.field_id = f.id
+            WHERE f.number <> :mixedFieldNumber
+            GROUP BY f.id, f.number, f.name
+            ORDER BY f.id ASC
         ');
+
+        $mixedFieldNumber = '0';
+        $stmt->bindParam(':mixedFieldNumber', $mixedFieldNumber, PDO::PARAM_STR);
         
         $stmt->execute();
 
