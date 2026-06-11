@@ -1,28 +1,145 @@
-<nav>
-  <div class="container">
-    <span class="logo"><i class="fa-solid fa-calculator"></i> MaturaMat</span>
+<style>
+    :root {
+        --bg-dark: #0f0c1b;
+        --card-dark: #1a162b;
+        --primary: #7030A0;
+        --primary-light: #D5B8EA;
+        --text-main: #f3f1f6;
+        --text-muted: #a39cb5;
+    }
 
-    <ul>
+    body {
+        margin: 0;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .main-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(26, 22, 43, 0.75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(213, 184, 234, 0.1);
+        padding: 0.5rem 0;
+    }
+
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: linear-gradient(135deg, var(--text-main) 30%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .logo i {
+        color: var(--primary-light);
+        -webkit-text-fill-color: initial;
+        filter: drop-shadow(0 0 8px rgba(112, 48, 160, 0.6));
+    }
+
+    .nav-menu {
+        list-style: none;
+        display: flex;
+        gap: 1.5rem;
+        margin: 0;
+        padding: 0;
+        align-items: center;
+    }
+
+    .nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .nav-link i {
+        font-size: 1.1rem;
+    }
+
+    .nav-link:hover {
+        color: var(--text-main);
+        background: rgba(112, 48, 160, 0.15);
+    }
+
+    /* Wyjątkowy styl dla Admina */
+    .nav-link-admin {
+        color: #ffc107;
+        background: rgba(255, 193, 7, 0.05);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+    
+    .nav-link-admin:hover {
+        color: #fff;
+        background: rgba(255, 193, 7, 0.2);
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+    }
+
+    /* Przycisk logowania / wylogowania jako przycisk akcji (CTA) */
+    .nav-cta {
+        background: linear-gradient(135deg, var(--primary) 0%, #502073 100%);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(112, 48, 160, 0.4);
+    }
+
+    .nav-cta:hover {
+        color: #fff;
+        background: linear-gradient(135deg, #843cae 0%, var(--primary) 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(112, 48, 160, 0.6);
+    }
+</style>
+
+<nav class="main-nav">
+  <div class="nav-container">
+    <span class="logo">
+        <i class="fa-solid fa-graduation-cap"></i> MaturaMat
+    </span>
+
+    <ul class="nav-menu">
       <li>
-        <a href="/index"><i class="fa-solid fa-house"></i> HOME</a>
+        <a href="/index" class="nav-link"><i class="fa-solid fa-compass"></i> HOME</a>
       </li>
 
       <?php if (isset($_SESSION['user_id'])): ?>
         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true): ?>
           <li>
-            <a href="/admin/users" style="color: #ffc107;"><i class="fa-solid fa-user-shield"></i> PANEL ADMINA</a>
+            <a href="/admin/users" class="nav-link nav-link-admin"><i class="fa-solid fa-user-gear"></i> PANEL ADMINA</a>
           </li>
         <?php endif; ?>
 
         <li>
-          <a href="/dashboard"><i class="fa-solid fa-chart-line"></i> MOJE POSTĘPY</a>
+          <a href="/dashboard" class="nav-link"><i class="fa-solid fa-chart-pie"></i> MOJE POSTĘPY</a>
         </li>
         <li>
-          <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> WYLOGUJ</a>
+          <a href="/logout" class="nav-link nav-cta"><i class="fa-solid fa-power-off"></i> WYLOGUJ</a>
         </li>
       <?php else: ?>
         <li>
-          <a href="/login"><i class="fa-solid fa-user"></i> LOGOWANIE</a>
+          <a href="/login" class="nav-link nav-cta"><i class="fa-solid fa-bolt"></i> LOGOWANIE</a>
         </li>
       <?php endif; ?>
     </ul>

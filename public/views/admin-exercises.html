@@ -4,59 +4,118 @@
     <?php include __DIR__ . '/partials/head.html'; ?>
     <title><?= $title ?? 'MaturaMat - Dodaj zadanie'; ?></title>
     <style>
-        .admin-container { max-width: 900px; margin: 30px auto; padding: 20px; font-family: Arial, sans-serif; }
-        .admin-header { background: #212529; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .admin-container { 
+            max-width: 1200px; 
+            margin: 18px auto; 
+            padding: 14px; 
+            font-family: Arial, sans-serif; 
+        }
+        .admin-header { 
+            background: #212529; 
+            color: white; 
+            padding: 14px 18px; 
+            border-radius: 8px; 
+            margin-bottom: 18px; 
+        }
+        .admin-header h1 { margin: 0 0 6px; font-size: 24px; }
+        .admin-header p { margin: 0; }
         .admin-tabs {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin: 20px 0 10px;
+            margin-top: 14px;
         }
         .admin-tab {
             display: inline-flex;
             align-items: center;
-            padding: 10px 18px;
-            border-radius: 8px;
-            background: #f1f3f5;
-            color: #212529;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: #343a40;
+            color: #dee2e6;
             text-decoration: none;
-            font-weight: 700;
+            font-weight: bold;
+            font-size: 14px;
             transition: background .2s ease, color .2s ease;
-            border: 1px solid transparent;
         }
         .admin-tab:hover {
-            background: #e9ecef;
+            background: #495057;
+            color: #fff;
         }
         .admin-tab.active {
             background: #0d6efd;
             color: #fff;
-            border-color: #0d6efd;
         }
         .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
+            margin-top: 14px;
         }
-        .form-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
+        .section-block h2 { margin: 0 0 12px; font-size: 19px; }
+        
+        /* Kontener tabeli z ograniczoną wysokością i paskiem przewijania */
+        .table-wrap { 
+            max-height: 65vh; 
+            overflow: auto; 
+            border-radius: 6px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            background: #fff; 
+            border: 1px solid #ddd;
+            margin-top: 15px;
+        }
+        .progress-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: #fff; 
+            color: #333 !important;
+        }
+        .progress-table th, .progress-table td { 
+            padding: 10px 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+            font-size: 14px;
+            color: #333 !important;
+        }
+        .progress-table th { 
+            background-color: #f8f9fa; 
+            color: #333 !important; 
+            font-weight: bold; 
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: inset 0 -1px 0 #ddd;
+        }
+        .progress-table tr:hover { 
+            background-color: #f1f1f1; 
+        }
+
+        /* Formularze i elementy interfejsu */
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333; }
         .form-group input,
-        .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
         .form-group input[type="file"] { padding: 8px; }
-        .btn-submit { background: #28a745; color: white; border: none; border-radius: 6px; padding: 12px 18px; font-size: 16px; cursor: pointer; }
+        
+        /* Przyciski */
+        .btn-submit { background: #28a745; color: white; border: none; border-radius: 20px; padding: 8px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background .2s ease; }
         .btn-submit:hover { background: #218838; }
-        .status-message { padding: 14px 16px; border-radius: 6px; margin-bottom: 20px; }
+        .btn-cancel { background: #6c757d; color: white; border: none; border-radius: 20px; padding: 8px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background .2s ease; }
+        .btn-cancel:hover { background: #5a6268; }
+
+        /* Komunikaty statusu */
+        .status-message { padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; font-weight: bold; }
         .status-success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
         .status-error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
-        .back-link { display: inline-block; margin-bottom: 18px; text-decoration: none; color: #007bff; }
-        .back-link:hover { text-decoration: underline; }
-        .exercise-thumb { max-width: 120px; border-radius: 6px; cursor: pointer; transition: transform .2s ease; }
+        
+        /* Miniaturki zdjęć */
+        .exercise-thumb { max-width: 100px; max-height: 60px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; cursor: pointer; transition: transform .2s ease; }
         .exercise-thumb:hover { transform: scale(1.05); }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
+        
+        /* Okna modalne */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; padding: 14px; box-sizing: border-box; }
         .modal.active { display: flex; }
-        .modal-content { background: #fff; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .modal-close { position: absolute; top: 16px; right: 18px; font-size: 28px; background: none; border: none; cursor: pointer; color: #333; }
+        .modal-content { background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; width: 100%; position: relative; }
+        .modal-close { position: absolute; top: 10px; right: 14px; font-size: 28px; background: none; border: none; cursor: pointer; color: white; z-index: 11; opacity: 0.8; transition: opacity .2s; }
+        .modal-close:hover { opacity: 1; }
+        .modal-body { padding: 20px; }
+        .modal-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -71,7 +130,7 @@
                 <a href="/admin/exercises" class="admin-tab active">Zadania</a>
             </div>
             <div class="header-actions">
-                <button id="open-add-exercise-modal" class="btn-submit">Dodaj zadanie</button>
+                <button id="open-add-exercise-modal" class="btn-submit"><i class="fa-solid fa-plus"></i> Dodaj zadanie</button>
             </div>
         </div>
 
@@ -84,126 +143,131 @@
         <div id="add-exercise-modal" class="modal">
             <div class="modal-content" style="max-width: 520px;">
                 <button class="modal-close" id="add-exercise-modal-close">&times;</button>
-                <div class="admin-header" style="margin-bottom: 0;">
+                <div class="admin-header" style="margin-bottom: 0; border-radius: 0;">
                     <h1>Dodaj nowe zadanie</h1>
-                    <p>Prześlij zdjęcie zadania, wybierz dział, rodzaj zadania oraz poprawną odpowiedź.</p>
+                    <p>Prześlaj zdjęcie, wybierz dział, typ oraz odpowiedź.</p>
                 </div>
-                <form action="/admin/exercises/create" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="image">Zdjęcie zadania</label>
-                        <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg,image/gif" required>
-                    </div>
+                <div class="modal-body">
+                    <form action="/admin/exercises/create" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="image">Zdjęcie zadania</label>
+                            <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg,image/gif" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="field_id">Dział</label>
-                        <select id="field_id" name="field_id" required>
-                            <option value="">Wybierz dział...</option>
-                            <?php foreach ($fields as $field): ?>
-                                <option value="<?= $field['id']; ?>">
-                                    <?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="field_id">Dział</label>
+                            <select id="field_id" name="field_id" required>
+                                <option value="">Wybierz dział...</option>
+                                <?php foreach ($fields as $field): ?>
+                                    <option value="<?= $field['id']; ?>">
+                                        <?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="type">Rodzaj zadania</label>
-                        <select id="type" name="type" required>
-                            <option value="">Wybierz rodzaj...</option>
-                            <option value="ABCD">ABCD</option>
-                            <option value="PF">PF</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="type">Rodzaj zadania</label>
+                            <select id="type" name="type" required>
+                                <option value="">Wybierz rodzaj...</option>
+                                <option value="ABCD">ABCD</option>
+                                <option value="PF">PF</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="right_answer">Poprawna odpowiedź</label>
-                        <input type="text" id="right_answer" name="right_answer" maxlength="4" required placeholder="np. A lub PF">
-                    </div>
+                        <div class="form-group">
+                            <label for="right_answer">Poprawna odpowiedź</label>
+                            <input type="text" id="right_answer" name="right_answer" maxlength="4" required placeholder="np. A lub PF">
+                        </div>
 
-                    <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
-                        <button type="button" class="btn-cancel" id="add-exercise-modal-cancel">Anuluj</button>
-                        <button type="submit" class="btn-submit">Dodaj zadanie</button>
-                    </div>
-                </form>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-cancel" id="add-exercise-modal-cancel">Anuluj</button>
+                            <button type="submit" class="btn-submit">Dodaj zadanie</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
-        <?php if (isset($exercises) && !empty($exercises)): ?>
-            <div class="form-card" style="margin-top: 30px;">
+        <section class="section-block" style="background: #fff; padding: 18px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.05);">
+            <?php if (isset($exercises) && !empty($exercises)): ?>
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center;">
                     <h2 style="margin: 0;">Lista zadań w bazie</h2>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <label for="filter-field" style="font-weight:bold;">Filtruj po dziale:</label>
-                        <select id="filter-field" style="padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px;">
-                            <option value="all">Wszystkie</option>
+                        <label for="filter-field" style="font-weight:bold; font-size: 14px;">Filtruj po dziale:</label>
+                        <select id="filter-field" style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+                            <option value="all">Wszystkie działy</option>
                             <?php foreach ($fields as $field): ?>
                                 <option value="<?= $field['id']; ?>"><?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                 </div>
-                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">ID</th>
-                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Dział</th>
-                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Typ</th>
-                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Poprawna odpowiedź</th>
-                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Zdjęcie</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($exercises as $exercise): ?>
-                            <tr data-field-id="<?= htmlspecialchars($exercise['field_id']); ?>">
-                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['id']); ?></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['field_number'] . ' - ' . $exercise['field_name']); ?></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['type']); ?></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['right_answer']); ?></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #eee;">
-                                    <img src="<?= htmlspecialchars('/' . ltrim($exercise['image_url'], '/')); ?>" alt="Podgląd zadania" class="exercise-thumb" data-full-src="<?= htmlspecialchars('/' . ltrim($exercise['image_url'], '/')); ?>">
-                                </td>
+
+                <div class="table-wrap">
+                    <table class="progress-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">ID</th>
+                                <th>Dział</th>
+                                <th style="width: 100px;">Typ</th>
+                                <th style="width: 160px;">Poprawna odpowiedź</th>
+                                <th style="width: 140px;">Zdjęcie</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php else: ?>
-            <div class="form-card" style="margin-top: 30px;">
-                <h2>Lista zadań w bazie</h2>
-                <p>Brak zadań w bazie danych.</p>
-            </div>
-        <?php endif; ?>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($exercises as $exercise): ?>
+                                <tr data-field-id="<?= htmlspecialchars($exercise['field_id']); ?>">
+                                    <td><?= htmlspecialchars($exercise['id']); ?></td>
+                                    <td><strong><?= htmlspecialchars($exercise['field_number'] . ' - ' . $exercise['field_name']); ?></strong></td>
+                                    <td><?= htmlspecialchars($exercise['type']); ?></td>
+                                    <td><span class="score-badge score-good" style="min-width: 30px;"><?= htmlspecialchars($exercise['right_answer']); ?></span></td>
+                                    <td>
+                                        <img src="<?= htmlspecialchars('/' . ltrim($exercise['image_url'], '/')); ?>" alt="Podgląd zadania" class="exercise-thumb" data-full-src="<?= htmlspecialchars('/' . ltrim($exercise['image_url'], '/')); ?>">
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <h2 style="margin: 0 0 10px 0;">Lista zadań w bazie</h2>
+                <p style="color: #666; font-style: italic; margin: 0;">Brak zadań w bazie danych.</p>
+            <?php endif; ?>
+        </section>
 
         <div id="image-preview-modal" class="modal">
-            <div class="modal-content" style="max-width: 800px; padding: 20px;">
-                <button class="modal-close" id="image-preview-modal-close">&times;</button>
-                <div style="text-align: center;">
-                    <img id="preview-image" src="" alt="Podgląd zadania" style="max-width: 100%; max-height: 80vh; border-radius: 8px;">
+            <div class="modal-content" style="max-width: 800px; background: #212529;">
+                <button class="modal-close" id="image-preview-modal-close" style="color: #fff;">&times;</button>
+                <div class="modal-body" style="text-align: center; padding: 30px 15px 15px 15px;">
+                    <img id="preview-image" src="" alt="Podgląd zadania" style="max-width: 100%; max-height: 75vh; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
                 </div>
             </div>
         </div>
-        <script>
-            const addExerciseModal = document.getElementById('add-exercise-modal');
-            const addExerciseOpen = document.getElementById('open-add-exercise-modal');
-            const addExerciseClose = document.getElementById('add-exercise-modal-close');
-            const addExerciseCancel = document.getElementById('add-exercise-modal-cancel');
-            const filterField = document.getElementById('filter-field');
-            const exerciseRows = document.querySelectorAll('tbody tr[data-field-id]');
-            const previewModal = document.getElementById('image-preview-modal');
-            const previewImage = document.getElementById('preview-image');
-            const previewClose = document.getElementById('image-preview-modal-close');
-            const exerciseThumbs = document.querySelectorAll('.exercise-thumb');
+    </main>
 
-            addExerciseOpen.addEventListener('click', function() {
-                addExerciseModal.classList.add('active');
-            });
-            addExerciseClose.addEventListener('click', function() {
-                addExerciseModal.classList.remove('active');
-            });
-            addExerciseCancel.addEventListener('click', function() {
-                addExerciseModal.classList.remove('active');
-            });
+    <script>
+        const addExerciseModal = document.getElementById('add-exercise-modal');
+        const addExerciseOpen = document.getElementById('open-add-exercise-modal');
+        const addExerciseClose = document.getElementById('add-exercise-modal-close');
+        const addExerciseCancel = document.getElementById('add-exercise-modal-cancel');
+        const filterField = document.getElementById('filter-field');
+        const exerciseRows = document.querySelectorAll('tbody tr[data-field-id]');
+        const previewModal = document.getElementById('image-preview-modal');
+        const previewImage = document.getElementById('preview-image');
+        const previewClose = document.getElementById('image-preview-modal-close');
+        const exerciseThumbs = document.querySelectorAll('.exercise-thumb');
 
+        // Obsługa modala dodawania
+        addExerciseOpen.addEventListener('click', function() {
+            addExerciseModal.classList.add('active');
+        });
+        const closeModalFn = () => addExerciseModal.classList.remove('active');
+        addExerciseClose.addEventListener('click', closeModalFn);
+        addExerciseCancel.addEventListener('click', closeModalFn);
+
+        // Dynamiczne filtrowanie tabeli
+        if (filterField) {
             filterField.addEventListener('change', function() {
                 const value = this.value;
                 exerciseRows.forEach((row) => {
@@ -211,24 +275,26 @@
                     row.style.display = (value === 'all' || rowFieldId === value) ? '' : 'none';
                 });
             });
+        }
 
-            exerciseThumbs.forEach((thumb) => {
-                thumb.addEventListener('click', function() {
-                    previewImage.src = this.dataset.fullSrc;
-                    previewModal.classList.add('active');
-                });
+        // Obsługa podglądu zdjęć
+        exerciseThumbs.forEach((thumb) => {
+            thumb.addEventListener('click', function() {
+                previewImage.src = this.dataset.fullSrc;
+                previewModal.classList.add('active');
             });
-            previewClose.addEventListener('click', function() {
-                previewModal.classList.remove('active');
-                previewImage.src = '';
-            });
-            previewModal.addEventListener('click', function(event) {
-                if (event.target === previewModal) {
-                    previewModal.classList.remove('active');
-                    previewImage.src = '';
-                }
-            });
-        </script>
-    </main>
+        });
+        
+        const closePreviewFn = () => {
+            previewModal.classList.remove('active');
+            previewImage.src = '';
+        };
+        previewClose.addEventListener('click', closePreviewFn);
+        previewModal.addEventListener('click', function(event) {
+            if (event.target === previewModal) {
+                closePreviewFn();
+            }
+        });
+    </script>
 </body>
 </html>

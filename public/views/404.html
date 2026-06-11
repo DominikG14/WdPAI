@@ -8,4 +8,87 @@
 <body>
     <h1>404</h1>
 </body>
+</html><!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Nie znaleziono strony | MaturaMat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #212529;
+        }
+        .error-container {
+            text-align: center;
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            max-width: 450px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #dee2e6;
+        }
+        .error-code {
+            font-size: 72px;
+            font-weight: 800;
+            margin: 0;
+            color: #212529;
+            line-height: 1;
+        }
+        .error-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 15px 0 10px;
+            color: #343a40;
+        }
+        .error-message {
+            font-size: 14px;
+            color: #6c757d;
+            margin: 0 0 24px 0;
+            line-height: 1.5;
+        }
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background .2s ease;
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.2);
+        }
+        .btn-home:hover {
+            background: #0b5ed7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Ups! Strona nie istnieje</h1>
+        <p class="error-message">
+            Szukana strona mogła zostać przeniesiona, usunięta lub po prostu nigdy nie istniała. Sprawdź poprawność adresu URL.
+        </p>
+        <a href="/" class="btn-home">
+            <i class="fa-solid fa-house"></i> Wróć do strony głównej
+        </a>
+    </div>
+
+</body>
 </html>

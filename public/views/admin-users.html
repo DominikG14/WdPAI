@@ -6,91 +6,104 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .admin-container { 
-            max-width: 1000px; 
-            margin: 30px auto; 
-            padding: 20px; 
+            max-width: 1200px; 
+            margin: 18px auto; 
+            padding: 14px; 
             font-family: Arial, sans-serif; 
         }
         .admin-header { 
             background: #212529; 
             color: white; 
-            padding: 20px; 
+            padding: 14px 18px; 
             border-radius: 8px; 
-            margin-bottom: 20px; 
+            margin-bottom: 18px; 
         }
+        .admin-header h1 { margin: 0 0 6px; font-size: 24px; }
+        .admin-header p { margin: 0; }
         .admin-tabs {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin: 20px 0 10px;
+            margin-top: 14px;
         }
         .admin-tab {
             display: inline-flex;
             align-items: center;
-            padding: 10px 18px;
-            border-radius: 8px;
-            background: #f1f3f5;
-            color: #212529;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: #343a40;
+            color: #dee2e6;
             text-decoration: none;
-            font-weight: 700;
+            font-weight: bold;
+            font-size: 14px;
             transition: background .2s ease, color .2s ease;
-            border: 1px solid transparent;
         }
         .admin-tab:hover {
-            background: #e9ecef;
+            background: #495057;
+            color: #fff;
         }
         .admin-tab.active {
             background: #0d6efd;
             color: #fff;
-            border-color: #0d6efd;
-        }
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
         }
         .search-box {
             width: 100%;
-            padding: 12px 20px;
-            margin: 20px 0;
+            padding: 10px 16px;
+            margin: 0 0 18px 0;
             box-sizing: border-box;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
             background-color: white;
+            transition: border-color .2s ease;
+        }
+        .search-box:focus {
+            border-color: #0d6efd;
+            outline: none;
+        }
+        .section-block h2 { margin: 0 0 12px; font-size: 19px; }
+        .table-wrap { 
+            max-height: 65vh; 
+            overflow: auto; 
+            border-radius: 6px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            background: #fff; 
+            border: 1px solid #ddd;
         }
         .users-table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin-top: 15px; 
             background: #fff; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            border-radius: 6px; 
-            overflow: hidden; 
+            color: #333 !important;
         }
         .users-table th, .users-table td { 
-            padding: 12px 15px; 
+            padding: 10px 12px; 
             text-align: left; 
             border-bottom: 1px solid #ddd; 
+            font-size: 14px;
+            color: #333 !important;
         }
         .users-table th { 
-            background-color: #f1f3f5; 
-            color: #495057; 
+            background-color: #f8f9fa; 
+            color: #333 !important; 
             font-weight: bold; 
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: inset 0 -1px 0 #ddd;
         }
         .users-table tr:hover { 
-            background-color: #f8f9fa; 
+            background-color: #f1f1f1; 
         }
         .btn-progress {
             background: #17a2b8; 
             color: white; 
-            padding: 6px 12px; 
+            padding: 5px 10px; 
             border: none;
-            border-radius: 4px; 
+            border-radius: 20px; 
             text-decoration: none; 
             font-weight: bold; 
-            font-size: 13px; 
+            font-size: 12px; 
             margin-right: 5px;
             display: inline-block;
         }
@@ -100,12 +113,12 @@
         .btn-delete { 
             background: #dc3545; 
             color: white; 
-            padding: 6px 12px; 
+            padding: 5px 10px; 
             border: none; 
-            border-radius: 4px; 
+            border-radius: 20px; 
             text-decoration: none; 
             font-weight: bold; 
-            font-size: 13px; 
+            font-size: 12px; 
             display: inline-block;
         }
         .btn-delete:hover { 
@@ -114,9 +127,10 @@
         .badge-self { 
             background: #6c757d; 
             color: white; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
+            padding: 5px 10px; 
+            border-radius: 20px; 
             font-size: 12px; 
+            font-weight: bold;
             display: inline-block;
         }
     </style>
@@ -134,44 +148,48 @@
             </div>
         </div>
 
-        <h2>Zarejestrowani użytkownicy</h2>
+        <section class="section-block">
+            <h2>Zarejestrowani użytkownicy</h2>
 
-        <input type="text" id="search-input" class="search-box" placeholder="Zacznij pisać aby wyszukać po loginie lub emailu...">
+            <input type="text" id="search-input" class="search-box" placeholder="Zacznij pisać, aby wyszukać po loginie lub e-mailu...">
 
-        <table class="users-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nazwa użytkownika</th>
-                    <th>Adres E-mail</th>
-                    <th>Akcje</th>
-                </tr>
-            </thead>
-            <tbody id="users-table-body">
-                <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td><?= $user->getId(); ?></td>
-                        <td><strong><?= htmlspecialchars($user->getUsername()); ?></strong></td>
-                        <td><?= htmlspecialchars($user->getEmail()); ?></td>
-                        <td>
-                            <a href="/admin/users/progress/<?= $user->getId(); ?>" class="btn-progress">
-                                <i class="fa-solid fa-eye"></i> Postępy
-                            </a>
+            <div class="table-wrap">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Nazwa użytkownika</th>
+                            <th>Adres E-mail</th>
+                            <th style="width: 240px;">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body">
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= $user->getId(); ?></td>
+                                <td><strong><?= htmlspecialchars($user->getUsername()); ?></strong></td>
+                                <td><?= htmlspecialchars($user->getEmail()); ?></td>
+                                <td>
+                                    <a href="/admin/users/progress/<?= $user->getId(); ?>" class="btn-progress">
+                                        <i class="fa-solid fa-eye"></i> Postępy
+                                    </a>
 
-                            <?php if ($user->getId() === $_SESSION['user_id']): ?>
-                                <span class="badge-self">To Ty</span>
-                            <?php else: ?>
-                                <a href="/admin/users/delete/<?= $user->getId(); ?>" 
-                                   class="btn-delete" 
-                                   onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
-                                   <i class="fa-solid fa-trash"></i> Usuń konto
-                                </a>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                                    <?php if ($user->getId() === $_SESSION['user_id']): ?>
+                                        <span class="badge-self">To Ty</span>
+                                    <?php else: ?>
+                                        <a href="/admin/users/delete/<?= $user->getId(); ?>" 
+                                           class="btn-delete" 
+                                           onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
+                                            <i class="fa-solid fa-trash"></i> Usuń konto
+                                        </a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <script>
@@ -189,14 +207,13 @@
                     dataType: 'json',
                     success: function(users) {
                         const $tableBody = $('#users-table-body');
-                        $tableBody.empty(); // Czyszczenie starych wierszy tabeli
+                        $tableBody.empty();
 
                         if (users.length === 0) {
-                            $tableBody.append('<tr><td colspan="4" style="text-align:center; color: #666; font-style: italic;">Nie znaleziono dopasowań.</td></tr>');
+                            $tableBody.append('<tr><td colspan="4" style="text-align:center; color: #666; font-style: italic; padding: 20px;">Nie znaleziono dopasowań.</td></tr>');
                             return;
                         }
 
-                        // Renderowanie nowych wierszy z danych JSON
                         users.forEach(function(user) {
                             let actionButton = '';
                             
@@ -207,12 +224,11 @@
                                     <a href="/admin/users/delete/${user.id}" 
                                        class="btn-delete" 
                                        onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
-                                       <i class="fa-solid fa-trash"></i> Usuń konto
+                                        <i class="fa-solid fa-trash"></i> Usuń konto
                                     </a>
                                 `;
                             }
 
-                            // Filtrowanie przed atakami XSS
                             const safeUsername = $('<div>').text(user.username).html();
                             const safeEmail = $('<div>').text(user.email).html();
 
@@ -234,7 +250,6 @@
                     },
                     error: function(xhr, status, error) {
                         console.error("Błąd AJAX: ", error);
-                        console.error("Status kodu: ", xhr.status);
                     }
                 });
             });

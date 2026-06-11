@@ -5,7 +5,7 @@
     <title>MaturaMat - Quiz</title>
     <style>
         .quiz-container { max-width: 700px; margin: 0 auto; padding: 20px; }
-        .exercise-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 25px; display: none; }
+        .exercise-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 25px; display: none; color: #333 !important; }
         .exercise-card.active { display: block; }
         .exercise-card img { max-width: 100%; height: auto; display: block; margin: 15px 0; }
         .options-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -52,6 +52,7 @@
             max-width: 500px;
             width: 90%;
             animation: slideIn 0.3s ease;
+            position: relative;
         }
         .modal-header {
             margin-bottom: 20px;
@@ -107,37 +108,13 @@
         .modal-actions .btn-submit:hover {
             background: #0056b3;
         }
-        .quick-counts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .quick-count {
-            padding: 8px 12px;
-            border: 1px solid #007bff;
-            border-radius: 5px;
-            background: #fff;
-            color: #007bff;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .quick-count:hover {
-            background: #007bff;
-            color: #fff;
-        }
-        .task-count-field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .task-count-field input {
-            width: 160px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
+
+        /* Ensure readable text color inside quiz summary and modals */
+        .summary-card { color: #333 !important; }
+        .summary-card h2, .summary-card p, .summary-card #save-status, .summary-card #feedback-text { color: #333 !important; }
+        .summary-card .review-item { color: #333 !important; }
+        .modal-content { color: #333 !important; }
+        .modal-content .modal-header h2, .modal-content .modal-header p, .modal-content .modal-actions button { color: #333 !important; }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -186,7 +163,7 @@
                         </div>
 
                         <div class="quiz-actions">
-                            <button type="button" class="btn-finish" onclick="finishQuizEarly()">Zako&#324;cz test</button>
+                            <button type="button" class="btn-finish" onclick="finishQuizEarly()">Zakończ test</button>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -218,7 +195,6 @@
             <a href="/index" class="btn-option" style="display: inline-block; text-decoration: none; margin-top: 25px; background: #007bff; color: white;">Rozwiąż inny dział</a>
         </div>
 
-        <!-- Modal potwierdzający zakończenie testu -->
         <div id="finish-quiz-modal" class="modal">
             <div class="modal-content">
                 <button class="modal-close" id="finish-quiz-modal-close">&times;</button>
@@ -231,8 +207,6 @@
                     <button type="button" class="btn-submit" id="finish-quiz-modal-confirm">Zakończ test</button>
                 </div>
             </div>
-        </div>
-
         </div>
     </main>
 
@@ -247,6 +221,11 @@
         const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false'; ?>;
         const justLoggedIn = <?= isset($_SESSION['justLoggedIn']) && $_SESSION['justLoggedIn'] ? 'true' : 'false'; ?>;
 
+        const finishQuizModal = document.getElementById('finish-quiz-modal');
+        const finishQuizModalClose = document.getElementById('finish-quiz-modal-close');
+        const finishQuizModalCancel = document.getElementById('finish-quiz-modal-cancel');
+        const finishQuizModalConfirm = document.getElementById('finish-quiz-modal-confirm');
+
         updateProgress();
         checkIfJustLoggedIn();
 
@@ -258,27 +237,18 @@
             return url;
         }
 
-        function closeNextFieldModal() {
-            nextFieldModal.classList.remove('active');
-        }
-
-        function closeNextRandomModal() {
-            nextRandomModal.classList.remove('active');
-        }
-
-        // Event listenery dla zamykania modali
-        nextFieldModalClose.addEventListener('click', closeNextFieldModal);
-        nextFieldModalCancel.addEventListener('click', closeNextFieldModal);
-        nextRandomModalClose.addEventListener('click', closeNextRandomModal);
-        nextRandomModalCancel.addEventListener('click', closeNextRandomModal);
+        // Event listenery dla zamykania modalu wcześniejszego zakończenia
+        finishQuizModalClose.addEventListener('click', closeFinishQuizModal);
+        finishQuizModalCancel.addEventListener('click', closeFinishQuizModal);
+        finishQuizModalConfirm.addEventListener('click', function() {
+            closeFinishQuizModal();
+            checkQuiz(true);
+        });
 
         // Zamykanie modali po kliknięciu poza oknem
         window.addEventListener('click', function(event) {
-            if (event.target === nextFieldModal) {
-                closeNextFieldModal();
-            }
-            if (event.target === nextRandomModal) {
-                closeNextRandomModal();
+            if (event.target === finishQuizModal) {
+                closeFinishQuizModal();
             }
         });
 
@@ -390,11 +360,6 @@
             }
         }
 
-        const finishQuizModal = document.getElementById('finish-quiz-modal');
-        const finishQuizModalClose = document.getElementById('finish-quiz-modal-close');
-        const finishQuizModalCancel = document.getElementById('finish-quiz-modal-cancel');
-        const finishQuizModalConfirm = document.getElementById('finish-quiz-modal-confirm');
-
         function closeFinishQuizModal() {
             finishQuizModal.classList.remove('active');
         }
@@ -403,18 +368,10 @@
             finishQuizModal.classList.add('active');
         }
 
-        finishQuizModalClose.addEventListener('click', closeFinishQuizModal);
-        finishQuizModalCancel.addEventListener('click', closeFinishQuizModal);
-        finishQuizModalConfirm.addEventListener('click', function() {
-            closeFinishQuizModal();
-            checkQuiz(true);
-        });
-
         function finishQuizEarly() {
             if (isChangingQuestion) {
                 return;
             }
-
             openFinishQuizModal();
         }
 
@@ -435,7 +392,6 @@
                 const isCorrect = (userAnswer === correctAnswer);
                 if (isCorrect) correctCount++;
 
-                // Blok generowania podglądu – odpala się TYLKO dla zalogowanych
                 if (isLoggedIn) {
                     const reviewItem = document.createElement('div');
                     reviewItem.className = `review-item ${isCorrect ? 'correct' : 'wrong'}`;
@@ -448,7 +404,6 @@
                 }
             });
 
-            // Przechowaj wynik w sessionStorage dla przypadku zalogowania się
             const quizResultKey = 'quiz_result_' + currentFieldId;
             const reviews = [];
             checkedCards.forEach((card, index) => {
@@ -467,13 +422,10 @@
             document.getElementById('quiz-section').style.display = 'none';
             document.getElementById('score-rating').innerText = `${correctCount} / ${checkedTotal}`;
 
-            // Zarządzanie widokiem w zależności od statusu zalogowania
             if (isLoggedIn) {
-                // Pokazujemy sekcję z błędami/poprawnymi odpowiedziami
                 document.getElementById('review-section').style.display = 'block';
                 document.getElementById('save-status').innerText = "Zapisywanie postępów w bazie danych...";
                 
-                // Fetch API – wysyłanie wyniku do bazy danych
                 if (currentFieldId > 0 && checkedTotal > 0) {
                     fetch('/exercises/save', {
                         method: 'POST',
@@ -498,11 +450,10 @@
                         document.getElementById('save-status').innerText = "🔴 Błąd połączenia. Wynik nie został zapisany.";
                     });
                 } else if (checkedTotal === 0) {
-                    document.getElementById('save-status').innerText = "Nie zapisano postepu, bo nie udzielono zadnej odpowiedzi.";
+                    document.getElementById('save-status').innerText = "Nie zapisano postępu, bo nie udzielono żadnej odpowiedzi.";
                     document.getElementById('save-status').style.color = "#dc3545";
                 }
             } else {
-                // Dla niezalogowanego ukrywamy podgląd, a pokazujemy okienko zachęty (login-box)
                 document.getElementById('review-section').style.display = 'none';
                 document.getElementById('anonymous-box').style.display = 'block';
             }
@@ -511,7 +462,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Event listenery dla przycisków zalogowania i rejestracji
         document.getElementById('login-link').addEventListener('click', function(e) {
             e.preventDefault();
             window.location.href = '/login?returnUrl=' + encodeURIComponent(buildReturnUrl());
