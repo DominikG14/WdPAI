@@ -33,10 +33,17 @@ class SecurityController extends AppController {
         $_SESSION['user_id'] = $user->getId();
         $_SESSION['user_email'] = $user->getEmail();
         $_SESSION['is_admin'] = $this->usersRepository->isAdmin($user->getId());
+        $_SESSION['justLoggedIn'] = true;
         
-        // ZMIANA: Przekierowanie na /index zamiast /dashboard
+        // Obsługuje returnUrl jeśli został podany
+        $returnUrl = isset($_POST['returnUrl']) && !empty($_POST['returnUrl']) ? $_POST['returnUrl'] : null;
+        
         $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/index");
+        if ($returnUrl) {
+            header("Location: {$url}{$returnUrl}");
+        } else {
+            header("Location: {$url}/index");
+        }
         exit();
     }
 
@@ -65,6 +72,41 @@ class SecurityController extends AppController {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $this->usersRepository->addUser($username, $email, $hashedPassword);
 
-        return $this->render("login", ['messages' => ['Zarejestrowano pomyślnie!']]);
+        // Po rejestracji, automatycznie zaloguj użytkownika
+        $newUser = $this->usersRepository->getUserByEmail($email);
+        if ($newUser) {
+            session_regenerate_id(true);
+            $_SESSION['user_id'] = $newUser->getId();
+            $_SESSION['user_email'] = $newUser->getEmail();
+            $_SESSION['is_admin'] = $this->usersRepository->isAdmin($newUser->getId());
+            $_SESSION['justLoggedIn'] = true;
+            
+            // Obsługuje returnUrl jeśli został podany
+            $returnUrl = isset($_POST['returnUrl']) && !empty($_POST['returnUrl']) ? $_POST['returnUrl'] : null;
+            
+            $url = "http://$_SERVER[HTTP_HOST]";
+            if ($returnUrl) {
+                header("Location: {$url}{$returnUrl}");
+            } else {
+                header("Location: {$url}/index");
+            }
+            exit();
+        }
+
+        return $this->render("login", ['messages' => ['Zarejestrowano pomyślnie! Spróbuj się zalogować.']]);
+    }
+
+    // NOWOŚĆ: Metoda obsługująca wylogowanie z systemu
+    public function logout() {
+        // Jeśli sesja istnieje, niszczymy ją w bezpieczny sposób
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            session_unset();
+            session_destroy();
+        }
+
+        // Przekierowanie użytkownika na stronę główną / logowanie
+        $url = "http://$_SERVER[HTTP_HOST]";
+        header("Location: {$url}/index");
+        exit();
     }
 }

@@ -26,6 +26,132 @@
         .review-item img { max-width: 150px; display: block; margin-top: 10px; }
         
         .login-box { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 15px; border-radius: 6px; margin-top: 20px; font-weight: bold; }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0 0 10px 0;
+        }
+        .modal-header p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-actions .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .modal-actions .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+        .modal-actions .btn-submit {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .modal-actions .btn-submit:hover {
+            background: #0056b3;
+        }
+        .quick-counts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .quick-count {
+            padding: 8px 12px;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            background: #fff;
+            color: #007bff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .quick-count:hover {
+            background: #007bff;
+            color: #fff;
+        }
+        .task-count-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .task-count-field input {
+            width: 160px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -85,11 +211,28 @@
 
             <div id="anonymous-box" class="login-box" style="display: none;">
                 💡 Chcesz sprawdzić, gdzie popełniłeś błędy i zapisać ten wynik? 
-                <a href="/login" style="color: #0056b3; text-decoration: underline;">Zaloguj się</a> lub 
-                <a href="/register" style="color: #0056b3; text-decoration: underline;">załóż darmowe konto</a>!
+                <a id="login-link" href="#" style="color: #0056b3; text-decoration: underline;">Zaloguj się</a> lub 
+                <a id="register-link" href="#" style="color: #0056b3; text-decoration: underline;">załóż darmowe konto</a>!
             </div>
 
             <a href="/index" class="btn-option" style="display: inline-block; text-decoration: none; margin-top: 25px; background: #007bff; color: white;">Rozwiąż inny dział</a>
+        </div>
+
+        <!-- Modal potwierdzający zakończenie testu -->
+        <div id="finish-quiz-modal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="finish-quiz-modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2>Zakończ test</h2>
+                    <p>Czy na pewno chcesz zakończyć test? Nieodpowiedziane zadania nie będą wliczane do wyniku.</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="finish-quiz-modal-cancel">Anuluj</button>
+                    <button type="button" class="btn-submit" id="finish-quiz-modal-confirm">Zakończ test</button>
+                </div>
+            </div>
+        </div>
+
         </div>
     </main>
 
@@ -100,9 +243,111 @@
         const totalCount = cards.length;
         
         const currentFieldId = <?= $fieldId ?? 0; ?>;
+        const currentTaskCount = <?= isset($_GET['limit']) ? (int)$_GET['limit'] : 0; ?>;
         const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false'; ?>;
+        const justLoggedIn = <?= isset($_SESSION['justLoggedIn']) && $_SESSION['justLoggedIn'] ? 'true' : 'false'; ?>;
 
         updateProgress();
+        checkIfJustLoggedIn();
+
+        function buildReturnUrl() {
+            let url = '/exercises/field/' + currentFieldId;
+            if (currentTaskCount > 0) {
+                url += '?limit=' + currentTaskCount;
+            }
+            return url;
+        }
+
+        function closeNextFieldModal() {
+            nextFieldModal.classList.remove('active');
+        }
+
+        function closeNextRandomModal() {
+            nextRandomModal.classList.remove('active');
+        }
+
+        // Event listenery dla zamykania modali
+        nextFieldModalClose.addEventListener('click', closeNextFieldModal);
+        nextFieldModalCancel.addEventListener('click', closeNextFieldModal);
+        nextRandomModalClose.addEventListener('click', closeNextRandomModal);
+        nextRandomModalCancel.addEventListener('click', closeNextRandomModal);
+
+        // Zamykanie modali po kliknięciu poza oknem
+        window.addEventListener('click', function(event) {
+            if (event.target === nextFieldModal) {
+                closeNextFieldModal();
+            }
+            if (event.target === nextRandomModal) {
+                closeNextRandomModal();
+            }
+        });
+
+        function checkIfJustLoggedIn() {
+            if (justLoggedIn) {
+                const quizResultKey = 'quiz_result_' + currentFieldId;
+                const savedResult = sessionStorage.getItem(quizResultKey);
+                if (savedResult) {
+                    try {
+                        const result = JSON.parse(savedResult);
+                        displaySummaryAfterLogin(result);
+                    } catch (e) {
+                        console.log('Error parsing saved quiz result:', e);
+                    }
+                }
+            }
+        }
+
+        function displaySummaryAfterLogin(result) {
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('score-rating').innerText = result.score + ' / ' + result.total;
+            
+            const reviewContainer = document.getElementById('review-container');
+            reviewContainer.innerHTML = '';
+            
+            if (result.reviews && result.reviews.length > 0) {
+                result.reviews.forEach(function(review, idx) {
+                    const reviewItem = document.createElement('div');
+                    reviewItem.className = 'review-item ' + (review.isCorrect ? 'correct' : 'wrong');
+                    reviewItem.innerHTML = '<strong>Zadanie ' + (idx + 1) + ':</strong> ' + (review.isCorrect ? '✅ Poprawnie' : '❌ Błąd') + '<br>' +
+                        'Twoja odpowiedź: <strong>' + (review.userAnswer || 'Brak') + '</strong> | Poprawna: <strong>' + review.correctAnswer + '</strong>' +
+                        '<img src="' + review.imgSrc + '" alt="Zadanie ' + (idx + 1) + '">';
+                    reviewContainer.appendChild(reviewItem);
+                });
+            }
+            
+            document.getElementById('review-section').style.display = 'block';
+            document.getElementById('anonymous-box').style.display = 'none';
+            document.getElementById('save-status').innerText = 'Zapisywanie postępów w bazie danych...';
+            
+            if (currentFieldId > 0 && result.total > 0) {
+                fetch('/exercises/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        field_id: currentFieldId,
+                        score: result.score,
+                        total: result.total
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success) {
+                        document.getElementById('save-status').innerText = '✅ Twój postęp został automatycznie zapisany!';
+                        document.getElementById('save-status').style.color = '#28a745';
+                    } else {
+                        document.getElementById('save-status').innerText = '⚠️ Nie udało się zapisać postępu.';
+                        document.getElementById('save-status').style.color = '#dc3545';
+                    }
+                    sessionStorage.removeItem('quiz_result_' + currentFieldId);
+                })
+                .catch(function() {
+                    document.getElementById('save-status').innerText = '🔴 Błąd połączenia. Wynik nie został zapisany.';
+                });
+            }
+            
+            document.getElementById('summary-section').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
         function handleAnswerClick(button, val) {
             if (isChangingQuestion) {
@@ -145,14 +390,32 @@
             }
         }
 
+        const finishQuizModal = document.getElementById('finish-quiz-modal');
+        const finishQuizModalClose = document.getElementById('finish-quiz-modal-close');
+        const finishQuizModalCancel = document.getElementById('finish-quiz-modal-cancel');
+        const finishQuizModalConfirm = document.getElementById('finish-quiz-modal-confirm');
+
+        function closeFinishQuizModal() {
+            finishQuizModal.classList.remove('active');
+        }
+
+        function openFinishQuizModal() {
+            finishQuizModal.classList.add('active');
+        }
+
+        finishQuizModalClose.addEventListener('click', closeFinishQuizModal);
+        finishQuizModalCancel.addEventListener('click', closeFinishQuizModal);
+        finishQuizModalConfirm.addEventListener('click', function() {
+            closeFinishQuizModal();
+            checkQuiz(true);
+        });
+
         function finishQuizEarly() {
             if (isChangingQuestion) {
                 return;
             }
 
-            if (confirm('Czy na pewno chcesz zakonczyc test w tym miejscu?')) {
-                checkQuiz(true);
-            }
+            openFinishQuizModal();
         }
 
         function checkQuiz(onlyAnswered = false) {
@@ -184,6 +447,22 @@
                     reviewContainer.appendChild(reviewItem);
                 }
             });
+
+            // Przechowaj wynik w sessionStorage dla przypadku zalogowania się
+            const quizResultKey = 'quiz_result_' + currentFieldId;
+            const reviews = [];
+            checkedCards.forEach((card, index) => {
+                const correctAnswer = card.getAttribute('data-correct').trim().toUpperCase();
+                const userAnswer = (card.getAttribute('data-user-answer') || '').trim().toUpperCase();
+                const imgSrc = card.getAttribute('data-img');
+                reviews.push({
+                    isCorrect: userAnswer === correctAnswer,
+                    userAnswer: userAnswer,
+                    correctAnswer: correctAnswer,
+                    imgSrc: imgSrc
+                });
+            });
+            sessionStorage.setItem(quizResultKey, JSON.stringify({ score: correctCount, total: checkedTotal, reviews: reviews }));
 
             document.getElementById('quiz-section').style.display = 'none';
             document.getElementById('score-rating').innerText = `${correctCount} / ${checkedTotal}`;
@@ -231,6 +510,16 @@
             document.getElementById('summary-section').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // Event listenery dla przycisków zalogowania i rejestracji
+        document.getElementById('login-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/login?returnUrl=' + encodeURIComponent(buildReturnUrl());
+        });
+        document.getElementById('register-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/register?returnUrl=' + encodeURIComponent(buildReturnUrl());
+        });
     </script>
 </body>
 </html>

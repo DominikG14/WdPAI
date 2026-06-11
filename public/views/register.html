@@ -25,8 +25,20 @@
             <input name="password" type="password" placeholder="Twoje hasło" required />
             <input name="password2" type="password" placeholder="Powtórz hasło" required />
             
+            <input type="hidden" name="returnUrl" id="returnUrl" value="" />
+            
             <button type="submit">REGISTER</button>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const returnUrl = params.get('returnUrl');
+            if (returnUrl) {
+                document.getElementById('returnUrl').value = returnUrl;
+            }
+        });
+    </script>
 </body>
 </html>

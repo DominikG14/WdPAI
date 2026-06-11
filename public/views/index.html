@@ -116,6 +116,100 @@
             background: #007bff;
             color: #fff;
         }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0 0 10px 0;
+        }
+        .modal-header p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .modal-actions .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .modal-actions .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+        .modal-actions .btn-submit {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .modal-actions .btn-submit:hover {
+            background: #0056b3;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -140,13 +234,7 @@
         <section class="random-section">
             <h2>Masz mało czasu?</h2>
             <p>Wylosuj zadania z różnych działów i sprawdź swoją ogólną wiedzę maturalną.</p>
-            <form id="random-exercises-form" class="task-count-form" style="justify-content: center; gap: 10px;">
-                <label class="task-count-field" for="random-task-count-input">
-                    Liczba zadań
-                    <input type="number" id="random-task-count-input" min="1" max="50" value="10" required>
-                </label>
-                <button type="submit" class="cta-button" style="background-color: #28a745; border: none;">Rozwiąż losowe zadania</button>
-            </form>
+            <button type="button" id="random-btn" class="cta-button" style="background-color: #28a745;">Rozwiąż losowe zadania</button>
         </section>
 
         <section class="fields-section">
@@ -176,46 +264,117 @@
                     </p>
                 <?php endif; ?>
             </div>
+        </section>
 
-            <div id="task-count-panel" class="task-count-panel">
-                <h3 id="selected-field-title">Wybierz liczbe zadan</h3>
-                <p id="selected-field-limit">Maksymalna liczba zadan w tym dziale: 0</p>
+        <!-- Modal dla wyboru liczby zadań z pola -->
+        <div id="field-modal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="field-modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2 id="field-modal-title">Wybierz liczbę zadań</h2>
+                    <p id="field-modal-subtitle">Maksymalna liczba zadań: 0</p>
+                </div>
 
-                <form id="task-count-form" class="task-count-form">
-                    <input type="hidden" id="selected-field-id">
+                <form id="field-task-count-form">
+                    <input type="hidden" id="field-id-input">
 
-                    <label class="task-count-field" for="task-count-input">
-                        Liczba zadan
-                        <input type="number" id="task-count-input" min="1" value="5" required>
+                    <label class="task-count-field" for="field-task-count-input">
+                        Liczba zadań
+                        <input type="number" id="field-task-count-input" min="1" value="5" required>
                     </label>
 
-                    <button type="submit" class="cta-button" style="border: none; margin-top: 0;">Rozpocznij</button>
-                </form>
+                    <div id="field-quick-counts" class="quick-counts" style="margin-top: 16px;"></div>
 
-                <div id="quick-counts" class="quick-counts" aria-label="Szybki wybor liczby zadan"></div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" id="field-modal-cancel">Anuluj</button>
+                        <button type="submit" class="btn-submit">Rozpocznij</button>
+                    </div>
+                </form>
             </div>
-        </section>
+        </div>
+
+        <!-- Modal dla losowych zadań -->
+        <div id="random-modal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="random-modal-close">&times;</button>
+                <div class="modal-header">
+                    <h2>Losowe zadania</h2>
+                    <p>Wybierz liczbę zadań do rozwiązania</p>
+                </div>
+
+                <form id="random-task-count-form">
+                    <label class="task-count-field" for="random-task-count-input" style="margin-bottom: 16px;">
+                        Liczba zadań (1-50)
+                        <input type="number" id="random-task-count-input" min="1" max="50" value="10" required>
+                    </label>
+
+                    <div id="random-quick-counts" class="quick-counts" style="margin-top: 16px;"></div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-cancel" id="random-modal-cancel">Anuluj</button>
+                        <button type="submit" class="btn-submit">Rozpocznij</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
     </main>
     <script>
-        const fieldCards = document.querySelectorAll('.field-card');
-        const taskCountPanel = document.getElementById('task-count-panel');
-        const selectedFieldTitle = document.getElementById('selected-field-title');
-        const selectedFieldLimit = document.getElementById('selected-field-limit');
-        const selectedFieldId = document.getElementById('selected-field-id');
-        const taskCountInput = document.getElementById('task-count-input');
-        const quickCounts = document.getElementById('quick-counts');
-        const taskCountForm = document.getElementById('task-count-form');
+        // Field Modal
+        const fieldModal = document.getElementById('field-modal');
+        const fieldModalClose = document.getElementById('field-modal-close');
+        const fieldModalCancel = document.getElementById('field-modal-cancel');
+        const fieldModalTitle = document.getElementById('field-modal-title');
+        const fieldModalSubtitle = document.getElementById('field-modal-subtitle');
+        const fieldIdInput = document.getElementById('field-id-input');
+        const fieldTaskCountInput = document.getElementById('field-task-count-input');
+        const fieldQuickCounts = document.getElementById('field-quick-counts');
+        const fieldTaskCountForm = document.getElementById('field-task-count-form');
+        
+        // Random Modal
+        const randomModal = document.getElementById('random-modal');
+        const randomModalClose = document.getElementById('random-modal-close');
+        const randomModalCancel = document.getElementById('random-modal-cancel');
         const randomTaskCountInput = document.getElementById('random-task-count-input');
-        const randomExercisesForm = document.getElementById('random-exercises-form');
+        const randomQuickCounts = document.getElementById('random-quick-counts');
+        const randomTaskCountForm = document.getElementById('random-task-count-form');
+        const randomBtn = document.getElementById('random-btn');
+        
+        const fieldCards = document.querySelectorAll('.field-card');
         const quickCountValues = [5, 10, 15, 20, 25, 30];
 
+        // Funkcje do zamykania modali
+        function closeFieldModal() {
+            fieldModal.classList.remove('active');
+        }
+
+        function closeRandomModal() {
+            randomModal.classList.remove('active');
+        }
+
+        // Event listenery dla zamykania modali
+        fieldModalClose.addEventListener('click', closeFieldModal);
+        fieldModalCancel.addEventListener('click', closeFieldModal);
+        randomModalClose.addEventListener('click', closeRandomModal);
+        randomModalCancel.addEventListener('click', closeRandomModal);
+
+        // Zamykanie modali po kliknięciu poza oknem
+        window.addEventListener('click', function(event) {
+            if (event.target === fieldModal) {
+                closeFieldModal();
+            }
+            if (event.target === randomModal) {
+                closeRandomModal();
+            }
+        });
+
+        // Obsługa kart pól
         fieldCards.forEach((card) => {
             const maxCount = parseInt(card.dataset.maxCount, 10);
             const countLabel = card.querySelector('.field-count');
 
             if (countLabel) {
-                countLabel.innerText = `Dost\u0119pne zadania: ${maxCount}`;
+                countLabel.innerText = `Dostępne zadania: ${maxCount}`;
             }
 
             card.addEventListener('click', () => {
@@ -224,13 +383,14 @@
                 const maxCount = parseInt(card.dataset.maxCount, 10);
                 const initialCount = Math.min(5, maxCount);
 
-                selectedFieldId.value = fieldId;
-                taskCountInput.max = maxCount;
-                taskCountInput.value = initialCount;
-                selectedFieldTitle.innerText = `Dzia\u0142: ${fieldName}`;
-                selectedFieldLimit.innerText = `Maksymalna liczba zada\u0144 w tym dziale: ${maxCount}`;
+                fieldIdInput.value = fieldId;
+                fieldTaskCountInput.max = maxCount;
+                fieldTaskCountInput.value = initialCount;
+                fieldModalTitle.innerText = `Dział: ${fieldName}`;
+                fieldModalSubtitle.innerText = `Maksymalna liczba zadań: ${maxCount}`;
 
-                quickCounts.innerHTML = '';
+                // Generowanie szybkich przycisków
+                fieldQuickCounts.innerHTML = '';
                 quickCountValues
                     .filter((count) => count <= maxCount)
                     .forEach((count) => {
@@ -238,10 +398,11 @@
                         button.type = 'button';
                         button.className = 'quick-count';
                         button.innerText = count;
-                        button.addEventListener('click', () => {
-                            taskCountInput.value = count;
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            fieldTaskCountInput.value = count;
                         });
-                        quickCounts.appendChild(button);
+                        fieldQuickCounts.appendChild(button);
                     });
 
                 if (maxCount > 0 && !quickCountValues.includes(maxCount)) {
@@ -249,35 +410,37 @@
                     button.type = 'button';
                     button.className = 'quick-count';
                     button.innerText = maxCount;
-                    button.addEventListener('click', () => {
-                        taskCountInput.value = maxCount;
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        fieldTaskCountInput.value = maxCount;
                     });
-                    quickCounts.appendChild(button);
+                    fieldQuickCounts.appendChild(button);
                 }
 
-                if (!quickCounts.children.length) {
+                if (!fieldQuickCounts.children.length) {
                     const button = document.createElement('button');
                     button.type = 'button';
                     button.className = 'quick-count';
                     button.innerText = maxCount;
-                    button.addEventListener('click', () => {
-                        taskCountInput.value = maxCount;
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        fieldTaskCountInput.value = maxCount;
                     });
-                    quickCounts.appendChild(button);
+                    fieldQuickCounts.appendChild(button);
                 }
 
-                taskCountPanel.classList.add('active');
-                taskCountPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                taskCountInput.focus();
+                fieldModal.classList.add('active');
+                fieldTaskCountInput.focus();
             });
         });
 
-        taskCountForm.addEventListener('submit', (event) => {
+        // Obsługa formularza polowego
+        fieldTaskCountForm.addEventListener('submit', (event) => {
             event.preventDefault();
 
-            const fieldId = selectedFieldId.value;
-            const maxCount = parseInt(taskCountInput.max, 10);
-            let selectedCount = parseInt(taskCountInput.value, 10);
+            const fieldId = fieldIdInput.value;
+            const maxCount = parseInt(fieldTaskCountInput.max, 10);
+            let selectedCount = parseInt(fieldTaskCountInput.value, 10);
 
             if (!fieldId || Number.isNaN(selectedCount)) {
                 return;
@@ -287,7 +450,30 @@
             window.location.href = `/exercises/field/${fieldId}?limit=${selectedCount}`;
         });
 
-        randomExercisesForm.addEventListener('submit', (event) => {
+        // Obsługa przycisku losowych zadań
+        randomBtn.addEventListener('click', () => {
+            randomTaskCountInput.value = 10;
+
+            // Generowanie szybkich przycisków
+            randomQuickCounts.innerHTML = '';
+            [5, 10, 15, 20, 25, 30, 50].forEach((count) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'quick-count';
+                button.innerText = count;
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    randomTaskCountInput.value = count;
+                });
+                randomQuickCounts.appendChild(button);
+            });
+
+            randomModal.classList.add('active');
+            randomTaskCountInput.focus();
+        });
+
+        // Obsługa formularza losowych zadań
+        randomTaskCountForm.addEventListener('submit', (event) => {
             event.preventDefault();
 
             let selectedCount = parseInt(randomTaskCountInput.value, 10);
