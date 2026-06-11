@@ -3,15 +3,21 @@
 require_once 'AppController.php';
 require_once __DIR__.'/../repositories/UsersRepository.php';
 require_once __DIR__.'/../repositories/ProgressRepository.php'; // Import repozytorium postępów
+require_once __DIR__.'/../repositories/ExercisesRepository.php';
+require_once __DIR__.'/../repositories/FieldsRepository.php';
 
 class AdminController extends AppController {
     private $usersRepository;
     private $progressRepository;
+    private $exercisesRepository;
+    private $fieldsRepository;
 
     public function __construct() {
         parent::__construct();
         $this->usersRepository = new UsersRepository();
         $this->progressRepository = new ProgressRepository(); // Inicjalizacja
+        $this->exercisesRepository = new ExercisesRepository();
+        $this->fieldsRepository = new FieldsRepository();
     }
 
     private function checkAdmin() {
@@ -51,6 +57,109 @@ class AdminController extends AppController {
             "targetUsername" => $targetUsername,
             "progress" => $progress
         ]);
+    }
+
+    public function exercises() {
+        $this->checkAdmin();
+
+        $fields = $this->fieldsRepository->getFields();
+
+        return $this->render("admin-exercises", [
+            "title" => "Panel Administratora - Dodaj zadanie",
+            "fields" => $fields,
+            "status" => null
+        ]);
+    }
+
+    public function createExercise() {
+        $this->checkAdmin();
+
+        if (!$this->isPost()) {
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/admin/exercises");
+            exit();
+        }
+
+        $fields = $this->fieldsRepository->getFields();
+        $status = [
+            'success' => false,
+            'message' => ''
+        ];
+
+        $fieldId = isset($_POST['field_id']) ? (int)$_POST['field_id'] : 0;
+        $type = isset($_POST['type']) ? trim($_POST['type']) : '';
+        $rightAnswer = isset($_POST['right_answer']) ? trim($_POST['right_answer']) : '';
+
+        // Walidacja pola i rodzaju
+        $allowedTypes = ['ABCD', 'PF'];
+        if ($fieldId <= 0 || empty($type) || !in_array($type, $allowedTypes, true)) {
+            $status['message'] = 'Wybierz poprawny dział i rodzaj zadania (ABCD lub PF).';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        if ($type === 'ABCD' && !preg_match('/^[A-D]$/', $rightAnswer)) {
+            $status['message'] = 'Dla zadania typu ABCD poprawna odpowiedź musi być jedną z: A, B, C, D.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        if ($type === 'PF' && !preg_match('/^(PP|PF|FP|FF)$/', $rightAnswer)) {
+            $status['message'] = 'Dla zadania typu PF poprawna odpowiedź musi być jedną z: PP, PF, FP, FF.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        $field = $this->fieldsRepository->getFieldById($fieldId);
+        if (!$field) {
+            $status['message'] = 'Wybrany dział nie istnieje.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            $status['message'] = 'Wybierz zdjęcie zadania w formacie PNG/JPG/JPEG/GIF.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        $imageFile = $_FILES['image'];
+        $imageTmp = $imageFile['tmp_name'];
+        $imageName = basename($imageFile['name']);
+        $extension = strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
+        $allowedExtensions = ['png', 'jpg', 'jpeg', 'gif'];
+
+        if (!in_array($extension, $allowedExtensions, true)) {
+            $status['message'] = 'Obsługiwane formaty obrazów to PNG, JPG, JPEG oraz GIF.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        if (!getimagesize($imageTmp)) {
+            $status['message'] = 'Wysłany plik nie wygląda na poprawne zdjęcie.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        $fieldDirName = preg_replace('/[^A-Za-z0-9_-]/', '_', $field['number']);
+        $destinationDir = __DIR__ . '/../../public/images/exercises/' . $fieldDirName;
+        if (!is_dir($destinationDir) && !mkdir($destinationDir, 0755, true) && !is_dir($destinationDir)) {
+            $status['message'] = 'Nie udało się utworzyć katalogu na obrazy.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        $destinationFileName = time() . '_' . bin2hex(random_bytes(6)) . '.' . $extension;
+        $destinationPath = $destinationDir . '/' . $destinationFileName;
+
+        if (!move_uploaded_file($imageTmp, $destinationPath)) {
+            $status['message'] = 'Nie udało się zapisać przesłanego pliku.';
+            return $this->render('admin-exercises', compact('fields', 'status'));
+        }
+
+        $imageUrl = 'public/images/exercises/' . $fieldDirName . '/' . $destinationFileName;
+
+        $success = $this->exercisesRepository->createExercise($fieldId, $imageUrl, $type, $rightAnswer);
+        if ($success) {
+            $status['success'] = true;
+            $status['message'] = 'Zadanie zostało pomyślnie dodane.';
+        } else {
+            $status['message'] = 'Wystąpił błąd podczas zapisywania zadania.';
+        }
+
+        return $this->render('admin-exercises', compact('fields', 'status'));
     }
 
     public function deleteUser($id) {

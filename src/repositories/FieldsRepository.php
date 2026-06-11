@@ -35,4 +35,18 @@ class FieldsRepository extends Repository {
         $field = $stmt->fetch(PDO::FETCH_ASSOC);
         return $field !== false ? $field : null;
     }
+
+    public function getFieldById(int $id): ?array {
+        $stmt = $this->getPDO()->prepare('
+            SELECT id, number, name
+            FROM fields
+            WHERE id = :id
+            LIMIT 1
+        ');
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $field = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $field !== false ? $field : null;
+    }
 }

@@ -46,16 +46,30 @@ class ExercisesRepository extends Repository {
     }
 
     public function saveProgress(int $userId, int $fieldId, int $score, int $total): bool {
-    $stmt = $this->getPDO()->prepare('
-        INSERT INTO user_progress (user_id, field_id, score, total)
-        VALUES (:userId, :fieldId, :score, :total)
-    ');
-    
-    return $stmt->execute([
-        'userId' => $userId,
-        'fieldId' => $fieldId,
-        'score' => $score,
-        'total' => $total
-    ]);
-}
+        $stmt = $this->getPDO()->prepare('
+            INSERT INTO user_progress (user_id, field_id, score, total)
+            VALUES (:userId, :fieldId, :score, :total)
+        ');
+        
+        return $stmt->execute([
+            'userId' => $userId,
+            'fieldId' => $fieldId,
+            'score' => $score,
+            'total' => $total
+        ]);
+    }
+
+    public function createExercise(int $fieldId, string $imageUrl, string $type, string $rightAnswer): bool {
+        $stmt = $this->getPDO()->prepare('
+            INSERT INTO exercises (field_id, image_url, type, right_answer)
+            VALUES (:fieldId, :imageUrl, :type, :rightAnswer)
+        ');
+
+        return $stmt->execute([
+            'fieldId' => $fieldId,
+            'imageUrl' => $imageUrl,
+            'type' => $type,
+            'rightAnswer' => $rightAnswer
+        ]);
+    }
 }
