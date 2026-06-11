@@ -5,7 +5,39 @@
     <title><?= $title ?? 'MaturaMat - Dodaj zadanie'; ?></title>
     <style>
         .admin-container { max-width: 900px; margin: 30px auto; padding: 20px; font-family: Arial, sans-serif; }
-        .admin-header { background: #212529; color: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .admin-header { background: #212529; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .admin-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0 10px;
+        }
+        .admin-tab {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: #f1f3f5;
+            color: #212529;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background .2s ease, color .2s ease;
+            border: 1px solid transparent;
+        }
+        .admin-tab:hover {
+            background: #e9ecef;
+        }
+        .admin-tab.active {
+            background: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
         .form-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; margin-bottom: 6px; font-weight: bold; }
@@ -31,12 +63,16 @@
     <?php include __DIR__ . '/partials/nav.html'; ?>
 
     <main class="admin-container">
-        <a href="/admin/users" class="back-link">&larr; Powrót do panelu admina</a>
-
         <div class="admin-header">
-            <h1>Dodaj nowe zadanie</h1>
-            <p>Prześlij zdjęcie zadania, wybierz dział, rodzaj zadania oraz poprawną odpowiedź.</p>
-            <button id="open-add-exercise-modal" class="btn-submit" style="margin-top: 16px;">Dodaj zadanie</button>
+            <h1>🛡️ Panel Administratora</h1>
+            <p>Przejrzysty widok zadań i użytkowników. Przełącz się szybko między tymi dwoma panelami.</p>
+            <div class="admin-tabs">
+                <a href="/admin/users" class="admin-tab">Użytkownicy</a>
+                <a href="/admin/exercises" class="admin-tab active">Zadania</a>
+            </div>
+            <div class="header-actions">
+                <button id="open-add-exercise-modal" class="btn-submit">Dodaj zadanie</button>
+            </div>
         </div>
 
         <?php if (isset($status) && !empty($status['message'])): ?>

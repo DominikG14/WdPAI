@@ -8,10 +8,17 @@
         .admin-header { background: #495057; color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
         .btn-back { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; font-weight: bold; }
         .btn-back:hover { text-decoration: underline; }
-        .progress-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 6px; overflow: hidden; }
-        .progress-table th, .progress-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        .progress-table th { background-color: #f1f3f5; color: #495057; font-weight: bold; }
-        .progress-table tr:hover { background-color: #f8f9fa; }
+        .progress-card { background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); margin-top: 20px; }
+        .progress-card h2 { margin-top: 0; font-size: 22px; }
+        .progress-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; margin-top: 15px; }
+        .progress-table th, .progress-table td { padding: 16px 18px; text-align: left; }
+        .progress-table th { background-color: #f8f9fa; color: #495057; font-weight: 700; border-bottom: 2px solid #dee2e6; }
+        .progress-table tbody tr { background: #fff; border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+        .progress-table tbody tr td { border: none; }
+        .progress-table tbody tr td:first-child { border-top-left-radius: 14px; border-bottom-left-radius: 14px; }
+        .progress-table tbody tr td:last-child { border-top-right-radius: 14px; border-bottom-right-radius: 14px; }
+        .progress-table tbody tr:hover { background-color: #f6f8fa; }
+        .progress-table thead tr { border-radius: 12px; }
         .score-badge { display: inline-block; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 13px; }
         .score-good { background: #d4edda; color: #155724; }
         .score-bad { background: #f8d7da; color: #721c24; }
@@ -34,7 +41,8 @@
                 <p>Ten użytkownik nie rozwiązał jeszcze żadnego testu.</p>
             </div>
         <?php else: ?>
-            <table class="progress-table">
+            <div class="progress-card">
+                <table class="progress-table">
                 <thead>
                     <tr>
                         <th>Dział matematyczny</th>
@@ -48,9 +56,15 @@
                         <?php 
                             $percentage = $row['total'] > 0 ? round(($row['score'] / $row['total']) * 100) : 0; 
                             $badgeClass = $percentage >= 50 ? 'score-good' : 'score-bad';
+                            $displayName = $row['name'];
+                            if (isset($row['field_id']) && (int)$row['field_id'] === 0) {
+                                $displayName = 'Mieszane zadania';
+                            } elseif (stripos($displayName, 'dział 0') !== false || stripos($displayName, 'dzial 0') !== false) {
+                                $displayName = 'Mieszane zadania';
+                            }
                         ?>
                         <tr>
-                            <td><strong><?= htmlspecialchars($row['name']); ?></strong></td>
+                            <td><strong><?= htmlspecialchars($displayName); ?></strong></td>
                             <td><?= $row['score']; ?> / <?= $row['total']; ?></td>
                             <td>
                                 <span class="score-badge <?= $badgeClass; ?>">

@@ -6,7 +6,7 @@ class ProgressRepository extends Repository {
 
     public function getUserProgress(int $userId): array {
         $stmt = $this->database->connect()->prepare('
-            SELECT COALESCE(f.name, \'Mieszane\') AS name, p.score, p.total, p.solved_at 
+            SELECT p.field_id, COALESCE(f.name, \'Mieszane\') AS name, p.score, p.total, p.solved_at 
             FROM user_progress p
             LEFT JOIN fields f ON p.field_id = f.id
             WHERE p.user_id = :userId
