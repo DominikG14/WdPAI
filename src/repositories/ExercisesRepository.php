@@ -72,4 +72,19 @@ class ExercisesRepository extends Repository {
             'rightAnswer' => $rightAnswer
         ]);
     }
+
+    public function getAllExercises(): array {
+        $sql = '
+            SELECT e.id, e.field_id, e.image_url, e.type, e.right_answer,
+                   f.number AS field_number, f.name AS field_name
+            FROM exercises e
+            LEFT JOIN fields f ON e.field_id = f.id
+            ORDER BY e.id DESC
+        ';
+
+        $stmt = $this->getPDO()->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

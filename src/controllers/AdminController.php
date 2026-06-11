@@ -63,10 +63,12 @@ class AdminController extends AppController {
         $this->checkAdmin();
 
         $fields = $this->fieldsRepository->getFields();
+        $exercises = $this->exercisesRepository->getAllExercises();
 
         return $this->render("admin-exercises", [
-            "title" => "Panel Administratora - Dodaj zadanie",
+            "title" => "Panel Administratora - Zadania",
             "fields" => $fields,
+            "exercises" => $exercises,
             "status" => null
         ]);
     }
@@ -81,6 +83,7 @@ class AdminController extends AppController {
         }
 
         $fields = $this->fieldsRepository->getFields();
+        $exercises = $this->exercisesRepository->getAllExercises();
         $status = [
             'success' => false,
             'message' => ''
@@ -155,11 +158,12 @@ class AdminController extends AppController {
         if ($success) {
             $status['success'] = true;
             $status['message'] = 'Zadanie zostało pomyślnie dodane.';
+            $exercises = $this->exercisesRepository->getAllExercises();
         } else {
             $status['message'] = 'Wystąpił błąd podczas zapisywania zadania.';
         }
 
-        return $this->render('admin-exercises', compact('fields', 'status'));
+        return $this->render('admin-exercises', compact('fields', 'exercises', 'status'));
     }
 
     public function deleteUser($id) {

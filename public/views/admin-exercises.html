@@ -19,6 +19,12 @@
         .status-error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
         .back-link { display: inline-block; margin-bottom: 18px; text-decoration: none; color: #007bff; }
         .back-link:hover { text-decoration: underline; }
+        .exercise-thumb { max-width: 120px; border-radius: 6px; cursor: pointer; transition: transform .2s ease; }
+        .exercise-thumb:hover { transform: scale(1.05); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-close { position: absolute; top: 16px; right: 18px; font-size: 28px; background: none; border: none; cursor: pointer; color: #333; }
     </style>
 </head>
 <body>
@@ -30,6 +36,7 @@
         <div class="admin-header">
             <h1>Dodaj nowe zadanie</h1>
             <p>Prześlij zdjęcie zadania, wybierz dział, rodzaj zadania oraz poprawną odpowiedź.</p>
+            <button id="open-add-exercise-modal" class="btn-submit" style="margin-top: 16px;">Dodaj zadanie</button>
         </div>
 
         <?php if (isset($status) && !empty($status['message'])): ?>
@@ -38,42 +45,154 @@
             </div>
         <?php endif; ?>
 
-        <div class="form-card">
-            <form action="/admin/exercises/create" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="image">Zdjęcie zadania</label>
-                    <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg,image/gif" required>
+        <div id="add-exercise-modal" class="modal">
+            <div class="modal-content" style="max-width: 520px;">
+                <button class="modal-close" id="add-exercise-modal-close">&times;</button>
+                <div class="admin-header" style="margin-bottom: 0;">
+                    <h1>Dodaj nowe zadanie</h1>
+                    <p>Prześlij zdjęcie zadania, wybierz dział, rodzaj zadania oraz poprawną odpowiedź.</p>
                 </div>
+                <form action="/admin/exercises/create" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="image">Zdjęcie zadania</label>
+                        <input type="file" id="image" name="image" accept="image/png,image/jpeg,image/jpg,image/gif" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="field_id">Dział</label>
-                    <select id="field_id" name="field_id" required>
-                        <option value="">Wybierz dział...</option>
-                        <?php foreach ($fields as $field): ?>
-                            <option value="<?= $field['id']; ?>">
-                                <?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="field_id">Dział</label>
+                        <select id="field_id" name="field_id" required>
+                            <option value="">Wybierz dział...</option>
+                            <?php foreach ($fields as $field): ?>
+                                <option value="<?= $field['id']; ?>">
+                                    <?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="type">Rodzaj zadania</label>
-                    <select id="type" name="type" required>
-                        <option value="">Wybierz rodzaj...</option>
-                        <option value="ABCD">ABCD</option>
-                        <option value="PF">PF</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label for="type">Rodzaj zadania</label>
+                        <select id="type" name="type" required>
+                            <option value="">Wybierz rodzaj...</option>
+                            <option value="ABCD">ABCD</option>
+                            <option value="PF">PF</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label for="right_answer">Poprawna odpowiedź</label>
-                    <input type="text" id="right_answer" name="right_answer" maxlength="4" required placeholder="np. A lub PF">
-                </div>
+                    <div class="form-group">
+                        <label for="right_answer">Poprawna odpowiedź</label>
+                        <input type="text" id="right_answer" name="right_answer" maxlength="4" required placeholder="np. A lub PF">
+                    </div>
 
-                <button type="submit" class="btn-submit">Dodaj zadanie</button>
-            </form>
+                    <div class="modal-actions" style="justify-content: space-between; margin-top: 20px;">
+                        <button type="button" class="btn-cancel" id="add-exercise-modal-cancel">Anuluj</button>
+                        <button type="submit" class="btn-submit">Dodaj zadanie</button>
+                    </div>
+                </form>
+            </div>
         </div>
+
+        <?php if (isset($exercises) && !empty($exercises)): ?>
+            <div class="form-card" style="margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center;">
+                    <h2 style="margin: 0;">Lista zadań w bazie</h2>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label for="filter-field" style="font-weight:bold;">Filtruj po dziale:</label>
+                        <select id="filter-field" style="padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px;">
+                            <option value="all">Wszystkie</option>
+                            <?php foreach ($fields as $field): ?>
+                                <option value="<?= $field['id']; ?>"><?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">ID</th>
+                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Dział</th>
+                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Typ</th>
+                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Poprawna odpowiedź</th>
+                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #dee2e6;">Zdjęcie</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($exercises as $exercise): ?>
+                            <tr data-field-id="<?= htmlspecialchars($exercise['field_id']); ?>">
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['id']); ?></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['field_number'] . ' - ' . $exercise['field_name']); ?></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['type']); ?></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;"><?= htmlspecialchars($exercise['right_answer']); ?></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                                    <img src="<?= htmlspecialchars('/' . ltrim($exercise['image_url'], '/')); ?>" alt="Podgląd zadania" class="exercise-thumb" data-full-src="<?= htmlspecialchars('/' . ltrim($exercise['image_url'], '/')); ?>">
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="form-card" style="margin-top: 30px;">
+                <h2>Lista zadań w bazie</h2>
+                <p>Brak zadań w bazie danych.</p>
+            </div>
+        <?php endif; ?>
+
+        <div id="image-preview-modal" class="modal">
+            <div class="modal-content" style="max-width: 800px; padding: 20px;">
+                <button class="modal-close" id="image-preview-modal-close">&times;</button>
+                <div style="text-align: center;">
+                    <img id="preview-image" src="" alt="Podgląd zadania" style="max-width: 100%; max-height: 80vh; border-radius: 8px;">
+                </div>
+            </div>
+        </div>
+        <script>
+            const addExerciseModal = document.getElementById('add-exercise-modal');
+            const addExerciseOpen = document.getElementById('open-add-exercise-modal');
+            const addExerciseClose = document.getElementById('add-exercise-modal-close');
+            const addExerciseCancel = document.getElementById('add-exercise-modal-cancel');
+            const filterField = document.getElementById('filter-field');
+            const exerciseRows = document.querySelectorAll('tbody tr[data-field-id]');
+            const previewModal = document.getElementById('image-preview-modal');
+            const previewImage = document.getElementById('preview-image');
+            const previewClose = document.getElementById('image-preview-modal-close');
+            const exerciseThumbs = document.querySelectorAll('.exercise-thumb');
+
+            addExerciseOpen.addEventListener('click', function() {
+                addExerciseModal.classList.add('active');
+            });
+            addExerciseClose.addEventListener('click', function() {
+                addExerciseModal.classList.remove('active');
+            });
+            addExerciseCancel.addEventListener('click', function() {
+                addExerciseModal.classList.remove('active');
+            });
+
+            filterField.addEventListener('change', function() {
+                const value = this.value;
+                exerciseRows.forEach((row) => {
+                    const rowFieldId = row.getAttribute('data-field-id');
+                    row.style.display = (value === 'all' || rowFieldId === value) ? '' : 'none';
+                });
+            });
+
+            exerciseThumbs.forEach((thumb) => {
+                thumb.addEventListener('click', function() {
+                    previewImage.src = this.dataset.fullSrc;
+                    previewModal.classList.add('active');
+                });
+            });
+            previewClose.addEventListener('click', function() {
+                previewModal.classList.remove('active');
+                previewImage.src = '';
+            });
+            previewModal.addEventListener('click', function(event) {
+                if (event.target === previewModal) {
+                    previewModal.classList.remove('active');
+                    previewImage.src = '';
+                }
+            });
+        </script>
     </main>
 </body>
 </html>
