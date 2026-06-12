@@ -1,17 +1,18 @@
 .quiz-container {
     max-width: 700px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 20px;
 }
 
 .exercise-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
+    background: var(--card-dark);
+    border: 1px solid rgba(213, 184, 234, 0.12);
+    border-radius: 16px;
+    padding: 24px;
     margin-bottom: 25px;
     display: none;
-    color: #333 !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.28);
 }
 
 .exercise-card.active {
@@ -23,6 +24,9 @@
     height: auto;
     display: block;
     margin: 15px 0;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 .options-group {
@@ -33,17 +37,20 @@
 
 .btn-option {
     padding: 12px 24px;
-    border: 1px solid #007bff;
-    background: #fff;
-    color: #007bff;
-    border-radius: 5px;
+    border: 1px solid rgba(213, 184, 234, 0.2);
+    background: rgba(15, 12, 27, 0.5);
+    color: var(--primary-light);
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
+    transition: all 0.2s ease;
 }
 
 .btn-option:hover {
-    background: #007bff;
+    background: var(--primary);
+    border-color: var(--primary);
     color: white;
+    transform: translateY(-1px);
 }
 
 .quiz-actions {
@@ -54,10 +61,10 @@
 
 .btn-finish {
     padding: 10px 16px;
-    border: 1px solid #dc3545;
-    background: #fff;
-    color: #dc3545;
-    border-radius: 5px;
+    border: 1px solid rgba(220, 53, 69, 0.45);
+    background: rgba(220, 53, 69, 0.08);
+    color: #ff8a96;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
 }
@@ -69,17 +76,18 @@
 
 .summary-card {
     display: none;
-    background: #e9ecef;
-    border: 2px solid #28a745;
+    background: var(--card-dark);
+    border: 1px solid rgba(0, 230, 118, 0.35);
     padding: 30px;
-    border-radius: 8px;
+    border-radius: 16px;
     margin-top: 20px;
     text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.28);
 }
 
 .progress-bar {
     font-size: 14px;
-    color: #666;
+    color: var(--primary-light);
     margin-bottom: 15px;
     font-weight: bold;
 }
@@ -87,8 +95,9 @@
 .back-link {
     display: inline-block;
     margin-bottom: 20px;
-    color: #007bff;
+    color: var(--primary-light);
     text-decoration: none;
+    font-weight: 700;
 }
 
 /* Style podglądu zadań dla zalogowanych */
@@ -100,20 +109,20 @@
 
 .review-item {
     padding: 15px;
-    border-radius: 6px;
+    border-radius: 10px;
     margin: 15px 0;
-    background: #fff;
+    background: rgba(15, 12, 27, 0.6);
     border-left: 6px solid #ccc;
 }
 
 .review-item.correct {
     border-left-color: #28a745;
-    background: #f1f9f3;
+    background: rgba(0, 230, 118, 0.08);
 }
 
 .review-item.wrong {
     border-left-color: #dc3545;
-    background: #fdf3f4;
+    background: rgba(220, 53, 69, 0.08);
 }
 
 .review-item img {
@@ -123,9 +132,9 @@
 }
 
 .login-box {
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
-    color: #856404;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.25);
+    color: #ffe08a;
     padding: 15px;
     border-radius: 6px;
     margin-top: 20px;
@@ -141,7 +150,8 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(10, 7, 18, 0.65);
+    backdrop-filter: blur(8px);
     animation: fadeIn 0.3s ease;
 }
 
@@ -152,10 +162,11 @@
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: var(--card-dark);
     padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    border: 1px solid rgba(213, 184, 234, 0.15);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     max-width: 500px;
     width: 90%;
     animation: slideIn 0.3s ease;
@@ -172,7 +183,7 @@
 
 .modal-header p {
     margin: 0;
-    color: #666;
+    color: var(--text-muted);
     font-size: 14px;
 }
 
@@ -182,7 +193,7 @@
     right: 20px;
     font-size: 28px;
     font-weight: bold;
-    color: #aaa;
+    color: var(--text-muted);
     cursor: pointer;
     border: none;
     background: none;
@@ -190,7 +201,7 @@
 }
 
 .modal-close:hover {
-    color: #000;
+    color: #fff;
 }
 
 .modal-actions {
@@ -202,37 +213,39 @@
 
 .modal-actions button {
     padding: 10px 20px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
+    border-radius: 10px;
+    border: 1px solid rgba(213, 184, 234, 0.2);
     cursor: pointer;
     font-weight: bold;
 }
 
 .modal-actions .btn-cancel {
-    background: #f0f0f0;
-    color: #333;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
 }
 
 .modal-actions .btn-cancel:hover {
-    background: #e0e0e0;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
 .modal-actions .btn-submit {
-    background: #007bff;
+    background: linear-gradient(135deg, var(--primary) 0%, #502073 100%);
     color: white;
-    border-color: #007bff;
+    border-color: var(--primary);
 }
 
 .modal-actions .btn-submit:hover {
-    background: #0056b3;
+    background: linear-gradient(135deg, #843cae 0%, var(--primary) 100%);
 }
 
 /* Ensure readable text color inside quiz summary and modals */
-.summary-card { color: #333 !important; }
-.summary-card h2, .summary-card p, .summary-card #save-status, .summary-card #feedback-text { color: #333 !important; }
-.summary-card .review-item { color: #333 !important; }
-.modal-content { color: #333 !important; }
-.modal-content .modal-header h2, .modal-content .modal-header p, .modal-content .modal-actions button { color: #333 !important; }
+.summary-card { color: var(--text-main) !important; }
+.summary-card h2, .summary-card p, .summary-card #save-status, .summary-card #feedback-text { color: var(--text-main) !important; }
+.summary-card .review-item { color: var(--text-main) !important; }
+.modal-content { color: var(--text-main) !important; }
+.modal-content .modal-header h2 { color: #fff !important; }
+.modal-content .modal-header p { color: var(--text-muted) !important; }
 
 @keyframes fadeIn {
     from { opacity: 0; }
