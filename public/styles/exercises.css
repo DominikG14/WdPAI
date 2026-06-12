@@ -1,0 +1,251 @@
+.quiz-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.exercise-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    display: none;
+    color: #333 !important;
+}
+
+.exercise-card.active {
+    display: block;
+}
+
+.exercise-card img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 15px 0;
+}
+
+.options-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-option {
+    padding: 12px 24px;
+    border: 1px solid #007bff;
+    background: #fff;
+    color: #007bff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-option:hover {
+    background: #007bff;
+    color: white;
+}
+
+.quiz-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+}
+
+.btn-finish {
+    padding: 10px 16px;
+    border: 1px solid #dc3545;
+    background: #fff;
+    color: #dc3545;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-finish:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
+.summary-card {
+    display: none;
+    background: #e9ecef;
+    border: 2px solid #28a745;
+    padding: 30px;
+    border-radius: 8px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.progress-bar {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+/* Style podglądu zadań dla zalogowanych */
+.review-section {
+    display: none;
+    text-align: left;
+    margin-top: 25px;
+}
+
+.review-item {
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+    background: #fff;
+    border-left: 6px solid #ccc;
+}
+
+.review-item.correct {
+    border-left-color: #28a745;
+    background: #f1f9f3;
+}
+
+.review-item.wrong {
+    border-left-color: #dc3545;
+    background: #fdf3f4;
+}
+
+.review-item img {
+    max-width: 150px;
+    display: block;
+    margin-top: 10px;
+}
+
+.login-box {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    animation: slideIn 0.3s ease;
+    position: relative;
+}
+
+.modal-header {
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0 0 10px 0;
+}
+
+.modal-header p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+.modal-close:hover {
+    color: #000;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.modal-actions .btn-cancel {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-actions .btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.modal-actions .btn-submit {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.modal-actions .btn-submit:hover {
+    background: #0056b3;
+}
+
+/* Ensure readable text color inside quiz summary and modals */
+.summary-card { color: #333 !important; }
+.summary-card h2, .summary-card p, .summary-card #save-status, .summary-card #feedback-text { color: #333 !important; }
+.summary-card .review-item { color: #333 !important; }
+.modal-content { color: #333 !important; }
+.modal-content .modal-header h2, .modal-content .modal-header p, .modal-content .modal-actions button { color: #333 !important; }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

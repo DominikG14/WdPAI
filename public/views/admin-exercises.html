@@ -2,121 +2,8 @@
 <html lang="pl">
 <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title><?= $title ?? 'MaturaMat - Dodaj zadanie'; ?></title>
-    <style>
-        .admin-container { 
-            max-width: 1200px; 
-            margin: 18px auto; 
-            padding: 14px; 
-            font-family: Arial, sans-serif; 
-        }
-        .admin-header { 
-            background: #212529; 
-            color: white; 
-            padding: 14px 18px; 
-            border-radius: 8px; 
-            margin-bottom: 18px; 
-        }
-        .admin-header h1 { margin: 0 0 6px; font-size: 24px; }
-        .admin-header p { margin: 0; }
-        .admin-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 14px;
-        }
-        .admin-tab {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            border-radius: 6px;
-            background: #343a40;
-            color: #dee2e6;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background .2s ease, color .2s ease;
-        }
-        .admin-tab:hover {
-            background: #495057;
-            color: #fff;
-        }
-        .admin-tab.active {
-            background: #0d6efd;
-            color: #fff;
-        }
-        .header-actions {
-            margin-top: 14px;
-        }
-        .section-block h2 { margin: 0 0 12px; font-size: 19px; }
-        
-        /* Kontener tabeli z ograniczoną wysokością i paskiem przewijania */
-        .table-wrap { 
-            max-height: 65vh; 
-            overflow: auto; 
-            border-radius: 6px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            background: #fff; 
-            border: 1px solid #ddd;
-            margin-top: 15px;
-        }
-        .progress-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            background: #fff; 
-            color: #333 !important;
-        }
-        .progress-table th, .progress-table td { 
-            padding: 10px 12px; 
-            text-align: left; 
-            border-bottom: 1px solid #ddd; 
-            font-size: 14px;
-            color: #333 !important;
-        }
-        .progress-table th { 
-            background-color: #f8f9fa; 
-            color: #333 !important; 
-            font-weight: bold; 
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: inset 0 -1px 0 #ddd;
-        }
-        .progress-table tr:hover { 
-            background-color: #f1f1f1; 
-        }
-
-        /* Formularze i elementy interfejsu */
-        .form-group { margin-bottom: 16px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 14px; color: #333; }
-        .form-group input,
-        .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
-        .form-group input[type="file"] { padding: 8px; }
-        
-        /* Przyciski */
-        .btn-submit { background: #28a745; color: white; border: none; border-radius: 20px; padding: 8px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background .2s ease; }
-        .btn-submit:hover { background: #218838; }
-        .btn-cancel { background: #6c757d; color: white; border: none; border-radius: 20px; padding: 8px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background .2s ease; }
-        .btn-cancel:hover { background: #5a6268; }
-
-        /* Komunikaty statusu */
-        .status-message { padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; font-weight: bold; }
-        .status-success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .status-error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
-        
-        /* Miniaturki zdjęć */
-        .exercise-thumb { max-width: 100px; max-height: 60px; object-fit: contain; border-radius: 4px; border: 1px solid #eee; cursor: pointer; transition: transform .2s ease; }
-        .exercise-thumb:hover { transform: scale(1.05); }
-        
-        /* Okna modalne */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); justify-content: center; align-items: center; padding: 14px; box-sizing: border-box; }
-        .modal.active { display: flex; }
-        .modal-content { background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; width: 100%; position: relative; }
-        .modal-close { position: absolute; top: 10px; right: 14px; font-size: 28px; background: none; border: none; cursor: pointer; color: white; z-index: 11; opacity: 0.8; transition: opacity .2s; }
-        .modal-close:hover { opacity: 1; }
-        .modal-body { padding: 20px; }
-        .modal-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
-    </style>
+    <link rel="stylesheet" href="/public/styles/admin-exercises.css">
+    <script src="/public/scripts/admin-exercises.js" defer></script>
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
@@ -189,13 +76,13 @@
             </div>
         </div>
 
-        <section class="section-block" style="background: #fff; padding: 18px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.05);">
+        <section class="section-block section-card">
             <?php if (isset($exercises) && !empty($exercises)): ?>
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center;">
-                    <h2 style="margin: 0;">Lista zadań w bazie</h2>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <label for="filter-field" style="font-weight:bold; font-size: 14px;">Filtruj po dziale:</label>
-                        <select id="filter-field" style="padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+                <div class="section-card-header">
+                    <h2>Lista zadań w bazie</h2>
+                    <div class="filter-container">
+                        <label for="filter-field">Filtruj po dziale:</label>
+                        <select id="filter-field">
                             <option value="all">Wszystkie działy</option>
                             <?php foreach ($fields as $field): ?>
                                 <option value="<?= $field['id']; ?>"><?= htmlspecialchars($field['number'] . ' - ' . $field['name']); ?></option>
@@ -231,8 +118,8 @@
                     </table>
                 </div>
             <?php else: ?>
-                <h2 style="margin: 0 0 10px 0;">Lista zadań w bazie</h2>
-                <p style="color: #666; font-style: italic; margin: 0;">Brak zadań w bazie danych.</p>
+                <h2>Lista zadań w bazie</h2>
+                <p class="no-data-text">Brak zadań w bazie danych.</p>
             <?php endif; ?>
         </section>
 
@@ -245,56 +132,5 @@
             </div>
         </div>
     </main>
-
-    <script>
-        const addExerciseModal = document.getElementById('add-exercise-modal');
-        const addExerciseOpen = document.getElementById('open-add-exercise-modal');
-        const addExerciseClose = document.getElementById('add-exercise-modal-close');
-        const addExerciseCancel = document.getElementById('add-exercise-modal-cancel');
-        const filterField = document.getElementById('filter-field');
-        const exerciseRows = document.querySelectorAll('tbody tr[data-field-id]');
-        const previewModal = document.getElementById('image-preview-modal');
-        const previewImage = document.getElementById('preview-image');
-        const previewClose = document.getElementById('image-preview-modal-close');
-        const exerciseThumbs = document.querySelectorAll('.exercise-thumb');
-
-        // Obsługa modala dodawania
-        addExerciseOpen.addEventListener('click', function() {
-            addExerciseModal.classList.add('active');
-        });
-        const closeModalFn = () => addExerciseModal.classList.remove('active');
-        addExerciseClose.addEventListener('click', closeModalFn);
-        addExerciseCancel.addEventListener('click', closeModalFn);
-
-        // Dynamiczne filtrowanie tabeli
-        if (filterField) {
-            filterField.addEventListener('change', function() {
-                const value = this.value;
-                exerciseRows.forEach((row) => {
-                    const rowFieldId = row.getAttribute('data-field-id');
-                    row.style.display = (value === 'all' || rowFieldId === value) ? '' : 'none';
-                });
-            });
-        }
-
-        // Obsługa podglądu zdjęć
-        exerciseThumbs.forEach((thumb) => {
-            thumb.addEventListener('click', function() {
-                previewImage.src = this.dataset.fullSrc;
-                previewModal.classList.add('active');
-            });
-        });
-        
-        const closePreviewFn = () => {
-            previewModal.classList.remove('active');
-            previewImage.src = '';
-        };
-        previewClose.addEventListener('click', closePreviewFn);
-        previewModal.addEventListener('click', function(event) {
-            if (event.target === previewModal) {
-                closePreviewFn();
-            }
-        });
-    </script>
 </body>
 </html>

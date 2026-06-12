@@ -1,29 +1,8 @@
 <!DOCTYPE html>
 <html lang="pl">
+<head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title><?= $title ?? 'MaturaMat - Panel Użytkownika'; ?></title>
-    <style>
-        .dashboard-container { max-width: 1200px; margin: 18px auto; padding: 14px; font-family: Arial, sans-serif; }
-        .dashboard-header { background: #007bff; color: white; padding: 14px 18px; border-radius: 8px; margin-bottom: 18px; }
-        .dashboard-header h1 { margin: 0 0 6px; font-size: 24px; }
-        .dashboard-header p { margin: 0; }
-        .dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr); gap: 18px; align-items: start; }
-        .table-wrap { max-height: 62vh; overflow: auto; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: #fff; border: 1px solid #ddd; }
-        .progress-table { width: 100%; border-collapse: collapse; background: #fff; color: #333 !important; }
-        .progress-table th, .progress-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; color: #333 !important; }
-        .progress-table th { background-color: #f8f9fa; color: #333 !important; font-weight: bold; position: sticky; top: 0; z-index: 10; box-shadow: inset 0 -1px 0 #ddd; }
-        .progress-table tr:hover { background-color: #f1f1f1; }
-        .score-badge { display: inline-block; min-width: 42px; padding: 4px 8px; border-radius: 20px; font-weight: bold; font-size: 13px; text-align: center; }
-        .score-good { background: #d4edda; color: #155724; }
-        .score-bad { background: #f8d7da; color: #721c24; }
-        .no-data { text-align: center; padding: 30px; color: #666; font-style: italic; }
-        .section-block h2 { margin: 0 0 12px; font-size: 19px; }
-        .field-name { max-width: 260px; }
-        @media (max-width: 900px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .table-wrap { max-height: none; }
-        }
-    </style>
+    <link rel="stylesheet" href="/public/styles/dashboard.css">
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
@@ -37,7 +16,7 @@
         <?php if (empty($progress)): ?>
             <div class="no-data">
                 <p>Nie rozwiązałeś jeszcze żadnego testu. Czas podszkolić matematykę!</p>
-                <a href="/index" style="color: #007bff; text-decoration: underline;">Przejdź do listy działów</a>
+                <a href="/index" class="link-index">Przejdź do listy działów</a>
             </div>
         <?php else: ?>
             <div class="dashboard-grid">
@@ -99,7 +78,7 @@
                                     <tr>
                                         <td class="field-name">
                                             <strong>Dz. <?= htmlspecialchars($row['number']); ?></strong><br>
-                                            <small style="color: #666;"><?= htmlspecialchars($row['name']); ?></small>
+                                            <small class="field-subtext"><?= htmlspecialchars($row['name']); ?></small>
                                         </td>
                                         <td><?= (int)$row['attempts_count']; ?></td>
                                         <td><?= $scoreSum; ?>/<?= $totalSum; ?></td>
