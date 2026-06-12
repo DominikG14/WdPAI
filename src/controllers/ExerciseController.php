@@ -6,13 +6,18 @@ require_once __DIR__ . '/../repositories/FieldsRepository.php';
 
 class ExerciseController extends AppController {
 
+    /**
+     * Render a randomized exercise set for a selected field.
+     *
+     * @param string $id Field identifier from the route.
+     * @return void
+     */
     public function field(string $id) {
         $exercisesRepository = new ExercisesRepository();
         $taskCount = isset($_GET['limit']) ? (int)$_GET['limit'] : null;
         $taskCount = $taskCount !== null && $taskCount > 0 ? $taskCount : null;
         $exercises = $exercisesRepository->getExercisesByField((int)$id, $taskCount);
 
-        // Uruchamiamy sesję, jeśli jeszcze nie ruszyła, żeby sprawdzić czy user jest zalogowany
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -20,10 +25,15 @@ class ExerciseController extends AppController {
         return $this->render('exercises', [
             'exercises' => $exercises,
             'fieldId' => (int)$id,
-            'isLoggedIn' => isset($_SESSION['user_id']), // Przekazujemy stan zalogowania do widoku
+            'isLoggedIn' => isset($_SESSION['user_id']),
         ]);
     }
 
+    /**
+     * Render a randomized mixed-field exercise set.
+     *
+     * @return void
+     */
     public function random() {
         $exercisesRepository = new ExercisesRepository();
         $fieldsRepository = new FieldsRepository();
@@ -47,14 +57,15 @@ class ExerciseController extends AppController {
     }
 
     /**
-     * Akcja wywoływana przez JS (Fetch API) pod adresem /exercises/save
+     * Persist quiz progress for the authenticated user through a JSON endpoint.
+     *
+     * @return void
      */
     public function save() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        // Blokada, jeśli ktoś kombinuje niezalogowany
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             header('Content-Type: application/json');
@@ -62,7 +73,6 @@ class ExerciseController extends AppController {
             exit();
         }
 
-        // Pobranie danych JSON przesłanych z JavaScriptu
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 

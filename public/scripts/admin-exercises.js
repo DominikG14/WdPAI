@@ -12,19 +12,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewClose = document.getElementById('image-preview-modal-close');
     const exerciseThumbs = document.querySelectorAll('.exercise-thumb');
 
-    // Obsługa modala dodawania
+    /**
+     * Close the add-exercise modal.
+     *
+     * @returns {void}
+     */
+    const closeModalFn = () => addExerciseModal.classList.remove('active');
+
+    /**
+     * Close the image preview modal and clear the preview source.
+     *
+     * @returns {void}
+     */
+    const closePreviewFn = () => {
+        previewModal.classList.remove('active');
+        previewImage.src = '';
+    };
+
+    // Add exercise modal
     if (addExerciseOpen) {
         addExerciseOpen.addEventListener('click', () => {
             addExerciseModal.classList.add('active');
         });
     }
 
-    const closeModalFn = () => addExerciseModal.classList.remove('active');
-    
     if (addExerciseClose) addExerciseClose.addEventListener('click', closeModalFn);
     if (addExerciseCancel) addExerciseCancel.addEventListener('click', closeModalFn);
 
-    // Dynamiczne filtrowanie tabeli po dziale
+    // Dynamic search
     if (filterField) {
         filterField.addEventListener('change', function() {
             const value = this.value;
@@ -35,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Obsługa podglądu zdjęć (Lightbox)
+    // Photo zoom
     exerciseThumbs.forEach((thumb) => {
         thumb.addEventListener('click', function() {
             previewImage.src = this.dataset.fullSrc;
@@ -43,11 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    const closePreviewFn = () => {
-        previewModal.classList.remove('active');
-        previewImage.src = '';
-    };
-
     if (previewClose) previewClose.addEventListener('click', closePreviewFn);
     
     if (previewModal) {

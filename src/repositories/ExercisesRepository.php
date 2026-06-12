@@ -4,8 +4,14 @@ require_once __DIR__ . '/Repository.php';
 
 class ExercisesRepository extends Repository {
 
+    /**
+     * Get randomized exercises for a single field.
+     *
+     * @param int $fieldId Field identifier.
+     * @param int|null $limit Optional maximum number of exercises.
+     * @return array<int,array<string,mixed>> Exercise rows.
+     */
     public function getExercisesByField(int $fieldId, ?int $limit = null): array {
-        // Używamy getPDO() z Twojej klasy bazowej
         $sql = '
             SELECT id, image_url, type, right_answer 
             FROM exercises 
@@ -26,10 +32,15 @@ class ExercisesRepository extends Repository {
         }
         $stmt->execute();
         
-        // Zwracamy czystą tablicę asocjacyjną
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Get randomized exercises from all fields.
+     *
+     * @param int $limit Maximum number of exercises.
+     * @return array<int,array<string,mixed>> Exercise rows.
+     */
     public function getRandomExercises(int $limit = 10): array {
         $sql = '
             SELECT id, image_url, type, right_answer
@@ -45,6 +56,15 @@ class ExercisesRepository extends Repository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Save a completed quiz attempt for a user.
+     *
+     * @param int $userId User identifier.
+     * @param int $fieldId Field identifier.
+     * @param int $score Number of correct answers.
+     * @param int $total Number of answered/scored exercises.
+     * @return bool True when the insert succeeds.
+     */
     public function saveProgress(int $userId, int $fieldId, int $score, int $total): bool {
         $stmt = $this->getPDO()->prepare('
             INSERT INTO user_progress (user_id, field_id, score, total)
@@ -59,6 +79,15 @@ class ExercisesRepository extends Repository {
         ]);
     }
 
+    /**
+     * Create a new exercise entry.
+     *
+     * @param int $fieldId Field identifier.
+     * @param string $imageUrl Stored image path.
+     * @param string $type Exercise type, either ABCD or PF.
+     * @param string $rightAnswer Correct answer value.
+     * @return bool True when the insert succeeds.
+     */
     public function createExercise(int $fieldId, string $imageUrl, string $type, string $rightAnswer): bool {
         $stmt = $this->getPDO()->prepare('
             INSERT INTO exercises (field_id, image_url, type, right_answer)
@@ -73,6 +102,11 @@ class ExercisesRepository extends Repository {
         ]);
     }
 
+    /**
+     * Return all exercises with field metadata for the admin panel.
+     *
+     * @return array<int,array<string,mixed>> Exercise rows with field labels.
+     */
     public function getAllExercises(): array {
         $sql = '
             SELECT e.id, e.field_id, e.image_url, e.type, e.right_answer,

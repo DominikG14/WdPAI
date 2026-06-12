@@ -6,7 +6,11 @@ require_once __DIR__.'/../repositories/ProgressRepository.php';
 
 class DashboardController extends AppController {
 
-    // Strona główna z listą działów do rozwiązywania
+    /**
+     * Render the public home page with available math fields.
+     *
+     * @return void
+     */
     public function index() {
         $fieldsRepository = new FieldsRepository();
         $fields = $fieldsRepository->getFields();
@@ -19,9 +23,12 @@ class DashboardController extends AppController {
         ]);
     }
 
-    // Osobna podstrona profilu i postępów użytkownika (/dashboard)
+    /**
+     * Render the authenticated user's progress dashboard.
+     *
+     * @return void
+     */
     public function dashboard() {
-        // Zabezpieczenie: jeśli użytkownik nie jest zalogowany, wyrzuć go do logowania
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
             header("Location: /login");
@@ -29,7 +36,6 @@ class DashboardController extends AppController {
         }
 
         $progressRepository = new ProgressRepository();
-        // Pobieramy historię wszystkich podejść zalogowanego użytkownika
         $progress = $progressRepository->getUserProgress($_SESSION['user_id']);
         $progressByField = $progressRepository->getUserProgressByField($_SESSION['user_id']);
 

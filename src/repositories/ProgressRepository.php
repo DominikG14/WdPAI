@@ -4,6 +4,12 @@ require_once 'Repository.php';
 
 class ProgressRepository extends Repository {
 
+    /**
+     * Return chronological quiz attempts for a user.
+     *
+     * @param int $userId User identifier.
+     * @return array<int,array<string,mixed>> Progress rows ordered newest first.
+     */
     public function getUserProgress(int $userId): array {
         $stmt = $this->database->connect()->prepare('
             SELECT p.field_id, COALESCE(f.name, \'Mieszane\') AS name, p.score, p.total, p.solved_at 
@@ -18,6 +24,12 @@ class ProgressRepository extends Repository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Return aggregate quiz results grouped by field for a user.
+     *
+     * @param int $userId User identifier.
+     * @return array<int,array<string,mixed>> Aggregated progress rows.
+     */
     public function getUserProgressByField(int $userId): array {
         $stmt = $this->database->connect()->prepare('
             SELECT

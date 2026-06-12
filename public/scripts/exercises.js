@@ -1,5 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Odczyt bezpiecznych konfiguracji przekazanych z PHP
+    /**
+     * @typedef {Object} QuizConfig
+     * @property {number} currentFieldId - Field identifier for the current quiz.
+     * @property {number} currentTaskCount - Requested task count from the previous screen.
+     * @property {boolean} isLoggedIn - Whether progress can be saved immediately.
+     * @property {boolean} justLoggedIn - Whether the user returned from auth during this quiz.
+     */
+
+    /**
+     * @typedef {Object} ReviewItem
+     * @property {boolean} isCorrect - Whether the selected answer was correct.
+     * @property {string} userAnswer - Answer selected by the user.
+     * @property {string} correctAnswer - Correct answer stored on the card.
+     * @property {string} imgSrc - Exercise image source.
+     */
+
+    /** @type {QuizConfig} */
     const config = window.QuizConfig || {
         currentFieldId: 0,
         currentTaskCount: 0,
@@ -18,11 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const finishQuizModalConfirm = document.getElementById('finish-quiz-modal-confirm');
     const earlyFinishButtons = document.querySelectorAll('#btn-early-finish');
 
-    // Inicjalizacja stanu quizu
     updateProgress();
     checkIfJustLoggedIn();
 
-    // Rejestracja kliknięć na opcje odpowiedzi (A, B, C, D lub PP, PF itd.)
     cards.forEach((card) => {
         const optionButtons = card.querySelectorAll('.btn-option');
         optionButtons.forEach((btn) => {
@@ -33,12 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Event listenery dla przycisków wcześniejszego kończenia testu na kartach
     earlyFinishButtons.forEach((btn) => {
         btn.addEventListener('click', finishQuizEarly);
     });
 
-    // Obsługa zamknięcia/zatwierdzenia modalu
+    // Exit modal
     if (finishQuizModalClose) finishQuizModalClose.addEventListener('click', closeFinishQuizModal);
     if (finishQuizModalCancel) finishQuizModalCancel.addEventListener('click', closeFinishQuizModal);
     if (finishQuizModalConfirm) {
@@ -48,13 +61,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Zamknięcie okna modalu po kliknięciu poza jego obszarem
     window.addEventListener('click', function(event) {
         if (event.target === finishQuizModal) {
             closeFinishQuizModal();
         }
     });
 
+    /**
+     * Build an internal URL that lets auth return to the same exercise set.
+     *
+     * @returns {string} Internal return URL for login/register redirects.
+     */
     function buildReturnUrl() {
         let url = '/exercises/field/' + config.currentFieldId;
         if (config.currentTaskCount > 0) {
@@ -63,6 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
         return url;
     }
 
+    /**
+     * Restore a stored quiz summary after the user logs in mid-flow.
+     *
+     * @returns {void}
+     */
     function checkIfJustLoggedIn() {
         if (config.justLoggedIn) {
             const quizResultKey = 'quiz_result_' + config.currentFieldId;
@@ -78,6 +100,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /**
+     * Display a saved anonymous result after authentication and persist it.
+     *
+     * @param {{score:number,total:number,reviews:ReviewItem[]}} result - Stored quiz result.
+     * @returns {void}
+     */
     function displaySummaryAfterLogin(result) {
         document.getElementById('quiz-section').style.display = 'none';
         document.getElementById('score-rating').innerText = result.score + ' / ' + result.total;
@@ -130,6 +158,13 @@ document.addEventListener('DOMContentLoaded', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    /**
+     * Record an answer, lock the current card, and advance to the next question.
+     *
+     * @param {HTMLButtonElement} button - Button clicked by the user.
+     * @param {string} val - Answer value from the clicked button.
+     * @returns {void}
+     */
     function handleAnswerClick(button, val) {
         if (isChangingQuestion) return;
 
@@ -159,6 +194,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 200);
     }
 
+    /**
+     * Update the visible quiz progress counter.
+     *
+     * @returns {void}
+     */
     function updateProgress() {
         const progressText = document.getElementById('quiz-progress');
         if (progressText && totalCount > 0) {
@@ -166,19 +206,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /**
+     * Hide the early-finish confirmation modal.
+     *
+     * @returns {void}
+     */
     function closeFinishQuizModal() {
         finishQuizModal.classList.remove('active');
     }
 
+    /**
+     * Show the early-finish confirmation modal.
+     *
+     * @returns {void}
+     */
     function openFinishQuizModal() {
         finishQuizModal.classList.add('active');
     }
 
+    /**
+     * Start the early-finish confirmation flow.
+     *
+     * @returns {void}
+     */
     function finishQuizEarly() {
         if (isChangingQuestion) return;
         openFinishQuizModal();
     }
 
+    /**
+     * Score the quiz, render the summary, and save progress when possible.
+     *
+     * @param {boolean} [onlyAnswered=false] Whether to score only answered cards.
+     * @returns {void}
+     */
     function checkQuiz(onlyAnswered = false) {
         let correctCount = 0;
         const reviewContainer = document.getElementById('review-container');
@@ -267,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Obsługa dynamicznych linków logowania i rejestracji z parametrem returnUrl
+    // Save progress after login/registering
     const loginLink = document.getElementById('login-link');
     const registerLink = document.getElementById('register-link');
 

@@ -11,17 +11,33 @@ class SecurityController extends AppController {
     private const MAX_PASSWORD_LENGTH = 128;
     private const MIN_PASSWORD_LENGTH = 8;
 
+    /**
+     * Create a controller with the shared users repository instance.
+     */
     public function __construct() {
         parent::__construct();
         $this->usersRepository = UsersRepository::getInstance();
     }
 
+    /**
+     * Write an audit entry for a failed login attempt without logging passwords.
+     *
+     * @param string $email Email submitted by the user.
+     * @param string $reason Machine-readable failure reason.
+     * @return void
+     */
     private function auditFailedLogin(string $email, string $reason): void {
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $safeEmail = substr(str_replace(["\r", "\n"], '', $email), 0, self::MAX_EMAIL_LENGTH);
         error_log(sprintf('[AUTH] failed_login email="%s" ip="%s" reason="%s"', $safeEmail, $ip, $reason));
     }
 
+    /**
+     * Validate password complexity required during registration.
+     *
+     * @param string $password Plain-text password from the registration form.
+     * @return bool True when the password satisfies the policy.
+     */
     private function isPasswordStrong(string $password): bool {
         return strlen($password) >= self::MIN_PASSWORD_LENGTH
             && strlen($password) <= self::MAX_PASSWORD_LENGTH
@@ -30,12 +46,23 @@ class SecurityController extends AppController {
             && preg_match('/\d/', $password);
     }
 
+    /**
+     * Redirect a successfully authenticated user to a safe target.
+     *
+     * @param string|null $returnUrl Optional internal URL requested before auth.
+     * @return void
+     */
     private function redirectAfterAuth(?string $returnUrl): void {
         $target = $this->sanitizeReturnUrl($returnUrl) ?? '/index';
         header("Location: {$target}");
         exit();
     }
 
+    /**
+     * Render the login form or authenticate submitted credentials.
+     *
+     * @return void
+     */
     public function login() {
         $this->requireHttps();
 
@@ -81,6 +108,11 @@ class SecurityController extends AppController {
         $this->redirectAfterAuth($_POST['returnUrl'] ?? null);
     }
 
+    /**
+     * Render the registration form or create a new user account.
+     *
+     * @return void
+     */
     public function register() {
         $this->requireHttps();
 
@@ -140,6 +172,11 @@ class SecurityController extends AppController {
         return $this->render("login", ['messages' => ['Zarejestrowano pomyslnie. Sprobuj sie zalogowac.']]);
     }
 
+    /**
+     * Destroy the current session and remove the session cookie.
+     *
+     * @return void
+     */
     public function logout() {
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_unset();

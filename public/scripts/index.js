@@ -22,34 +22,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const fieldCards = document.querySelectorAll('.field-card');
     const quickCountValues = [5, 10, 15, 20, 25, 30];
 
-    // Funkcje do zamykania modali
+    // Modals logic
+    /**
+     * Show the field task-count modal.
+     *
+     * @returns {void}
+     */
     function openFieldModal() {
         fieldModal.hidden = false;
         fieldModal.classList.add('active');
     }
 
+    /**
+     * Hide the field task-count modal.
+     *
+     * @returns {void}
+     */
     function closeFieldModal() {
         fieldModal.classList.remove('active');
         fieldModal.hidden = true;
     }
 
+    /**
+     * Show the random task-count modal.
+     *
+     * @returns {void}
+     */
     function openRandomModal() {
         randomModal.hidden = false;
         randomModal.classList.add('active');
     }
 
+    /**
+     * Hide the random task-count modal.
+     *
+     * @returns {void}
+     */
     function closeRandomModal() {
         randomModal.classList.remove('active');
         randomModal.hidden = true;
     }
 
-    // Event listenery dla zamykania modali
     fieldModalClose.addEventListener('click', closeFieldModal);
     fieldModalCancel.addEventListener('click', closeFieldModal);
     randomModalClose.addEventListener('click', closeRandomModal);
     randomModalCancel.addEventListener('click', closeRandomModal);
 
-    // Zamykanie modali po kliknięciu poza oknem modalnym
     window.addEventListener('click', function(event) {
         if (event.target === fieldModal) {
             closeFieldModal();
@@ -59,7 +77,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Obsługa kart pól (działów)
+    /**
+     * Populate quick-count buttons for a field modal.
+     *
+     * @param {HTMLElement} container - Element that receives quick-count buttons.
+     * @param {number} maxCount - Maximum available exercises for the selected field.
+     * @param {HTMLInputElement} targetInput - Input updated by quick-count buttons.
+     * @returns {void}
+     */
+    function renderQuickCounts(container, maxCount, targetInput) {
+        container.innerHTML = '';
+        quickCountValues
+            .filter((count) => count <= maxCount)
+            .forEach((count) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'quick-count';
+                button.innerText = count;
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    targetInput.value = count;
+                });
+                container.appendChild(button);
+            });
+
+        if (maxCount > 0 && !quickCountValues.includes(maxCount)) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'quick-count';
+            button.innerText = maxCount;
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                targetInput.value = maxCount;
+            });
+            container.appendChild(button);
+        }
+
+        if (!container.children.length) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'quick-count';
+            button.innerText = maxCount;
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                targetInput.value = maxCount;
+            });
+            container.appendChild(button);
+        }
+    }
+
+    // Fields
     fieldCards.forEach((card) => {
         const maxCount = parseInt(card.dataset.maxCount, 10);
         const countLabel = card.querySelector('.field-count');
@@ -80,52 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fieldModalTitle.innerText = `Dział: ${fieldName}`;
             fieldModalSubtitle.innerText = `Maksymalna liczba zadań: ${maxCount}`;
 
-            // Generowanie szybkich przycisków wyboru liczby zadań
-            fieldQuickCounts.innerHTML = '';
-            quickCountValues
-                .filter((count) => count <= maxCount)
-                .forEach((count) => {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.className = 'quick-count';
-                    button.innerText = count;
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        fieldTaskCountInput.value = count;
-                    });
-                    fieldQuickCounts.appendChild(button);
-                });
-
-            if (maxCount > 0 && !quickCountValues.includes(maxCount)) {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'quick-count';
-                button.innerText = maxCount;
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    fieldTaskCountInput.value = maxCount;
-                });
-                fieldQuickCounts.appendChild(button);
-            }
-
-            if (!fieldQuickCounts.children.length) {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'quick-count';
-                button.innerText = maxCount;
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    fieldTaskCountInput.value = maxCount;
-                });
-                fieldQuickCounts.appendChild(button);
-            }
+            renderQuickCounts(fieldQuickCounts, maxCount, fieldTaskCountInput);
 
             openFieldModal();
             fieldTaskCountInput.focus();
         });
     });
 
-    // Obsługa formularza wyboru zadań z konkretnego działu
     fieldTaskCountForm.addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -141,11 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/exercises/field/${fieldId}?limit=${selectedCount}`;
     });
 
-    // Obsługa przycisku losowych zadań
+    // Random exercises
     randomBtn.addEventListener('click', () => {
         randomTaskCountInput.value = 10;
 
-        // Generowanie szybkich przycisków dla losowych zadań
         randomQuickCounts.innerHTML = '';
         [5, 10, 15, 20, 25, 30, 50].forEach((count) => {
             const button = document.createElement('button');
@@ -163,7 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
         randomTaskCountInput.focus();
     });
 
-    // Obsługa formularza losowych zadań
     randomTaskCountForm.addEventListener('submit', (event) => {
         event.preventDefault();
 

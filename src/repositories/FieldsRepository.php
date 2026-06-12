@@ -4,6 +4,11 @@ require_once __DIR__ . '/Repository.php';
 
 class FieldsRepository extends Repository {
 
+    /**
+     * Get all non-mixed fields with their available exercise count.
+     *
+     * @return array<int,array<string,mixed>> Field rows.
+     */
     public function getFields(): array {
         $stmt = $this->getPDO()->prepare('
             SELECT f.id, f.number, f.name, COUNT(e.id) AS exercises_count
@@ -22,6 +27,12 @@ class FieldsRepository extends Repository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Find a field by its public number.
+     *
+     * @param string $number Field number such as I, II, or 0.
+     * @return array<string,mixed>|null Field row or null when missing.
+     */
     public function getFieldByNumber(string $number): ?array {
         $stmt = $this->getPDO()->prepare('
             SELECT id, number, name
@@ -36,6 +47,12 @@ class FieldsRepository extends Repository {
         return $field !== false ? $field : null;
     }
 
+    /**
+     * Find a field by database identifier.
+     *
+     * @param int $id Field identifier.
+     * @return array<string,mixed>|null Field row or null when missing.
+     */
     public function getFieldById(int $id): ?array {
         $stmt = $this->getPDO()->prepare('
             SELECT id, number, name

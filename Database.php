@@ -8,6 +8,9 @@ class Database {
     private $database;
     private static $instance = null;
 
+    /**
+     * Load database connection settings from config constants.
+     */
     private function __construct() {
         $this->username = USERNAME;
         $this->password = PASSWORD;
@@ -15,6 +18,11 @@ class Database {
         $this->database = DATABASE;
     }
 
+    /**
+     * Return the shared database service instance.
+     *
+     * @return Database Singleton instance.
+     */
     public static function getInstance() {
         if (self::$instance === null) {
             self::$instance = new Database();
@@ -22,7 +30,11 @@ class Database {
         return self::$instance;
     }
 
-    // ZMIANA: Metoda musi być publiczna, aby Repozytorium mogło z niej skorzystać
+    /**
+     * Open a new PDO connection to PostgreSQL.
+     *
+     * @return PDO Active database connection.
+     */
     public function connect() {
         try {
             $conn = new PDO(

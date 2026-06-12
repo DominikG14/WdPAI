@@ -2,7 +2,7 @@
 
 require_once 'AppController.php';
 require_once __DIR__.'/../repositories/UsersRepository.php';
-require_once __DIR__.'/../repositories/ProgressRepository.php'; // Import repozytorium postępów
+require_once __DIR__.'/../repositories/ProgressRepository.php';
 require_once __DIR__.'/../repositories/ExercisesRepository.php';
 require_once __DIR__.'/../repositories/FieldsRepository.php';
 
@@ -12,14 +12,22 @@ class AdminController extends AppController {
     private $exercisesRepository;
     private $fieldsRepository;
 
+    /**
+     * Create an admin controller with all repositories used by admin screens.
+     */
     public function __construct() {
         parent::__construct();
         $this->usersRepository = UsersRepository::getInstance();
-        $this->progressRepository = new ProgressRepository(); // Inicjalizacja
+        $this->progressRepository = new ProgressRepository();
         $this->exercisesRepository = new ExercisesRepository();
         $this->fieldsRepository = new FieldsRepository();
     }
 
+    /**
+     * Ensure the current session belongs to an administrator.
+     *
+     * @return void
+     */
     private function checkAdmin() {
         if (!isset($_SESSION['user_id']) || !$this->usersRepository->isAdmin($_SESSION['user_id'])) {
             http_response_code(403);
@@ -28,6 +36,11 @@ class AdminController extends AppController {
         }
     }
 
+    /**
+     * Render the user management screen.
+     *
+     * @return void
+     */
     public function users() {
         $this->checkAdmin();
         $users = $this->usersRepository->getUsers();
@@ -38,7 +51,12 @@ class AdminController extends AppController {
         ]);
     }
 
-    // NOWA METODA: Widok postępów konkretnego użytkownika
+    /**
+     * Render progress history for a selected user.
+     *
+     * @param mixed $id User identifier from the route.
+     * @return void
+     */
     public function userProgress($id) {
         $this->checkAdmin();
 
@@ -49,7 +67,6 @@ class AdminController extends AppController {
             exit();
         }
 
-        // Używamy stworzonej wcześniej metody z ProgressRepository
         $progress = $this->progressRepository->getUserProgress((int)$id);
 
         return $this->render("admin-user-progress", [
@@ -59,6 +76,11 @@ class AdminController extends AppController {
         ]);
     }
 
+    /**
+     * Render the exercise management screen.
+     *
+     * @return void
+     */
     public function exercises() {
         $this->checkAdmin();
 
@@ -73,6 +95,11 @@ class AdminController extends AppController {
         ]);
     }
 
+    /**
+     * Validate uploaded exercise data and create a new exercise.
+     *
+     * @return void
+     */
     public function createExercise() {
         $this->checkAdmin();
 
@@ -93,7 +120,6 @@ class AdminController extends AppController {
         $type = isset($_POST['type']) ? trim($_POST['type']) : '';
         $rightAnswer = isset($_POST['right_answer']) ? trim($_POST['right_answer']) : '';
 
-        // Walidacja pola i rodzaju
         $allowedTypes = ['ABCD', 'PF'];
         if ($fieldId <= 0 || empty($type) || !in_array($type, $allowedTypes, true)) {
             $status['message'] = 'Wybierz poprawny dział i rodzaj zadania (ABCD lub PF).';
@@ -166,6 +192,12 @@ class AdminController extends AppController {
         return $this->render('admin-exercises', compact('fields', 'exercises', 'status'));
     }
 
+    /**
+     * Delete a user account unless it belongs to the current administrator.
+     *
+     * @param mixed $id User identifier from the route.
+     * @return void
+     */
     public function deleteUser($id) {
         $this->checkAdmin();
         
@@ -179,6 +211,11 @@ class AdminController extends AppController {
         exit();
     }
 
+    /**
+     * Search users and return a JSON response for the admin table.
+     *
+     * @return void
+     */
     public function searchUsers() {
         $this->checkAdmin();
 

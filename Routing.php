@@ -3,7 +3,7 @@
 require_once 'src/controllers/DashboardController.php';
 require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/ExerciseController.php';
-require_once 'src/controllers/AdminController.php'; // Zaimportowany kontroler admina
+require_once 'src/controllers/AdminController.php';
 
 class Routing {
 
@@ -71,10 +71,8 @@ class Routing {
     ];
 
     public static function run(string $path) {
-        // Zabezpieczenie: Odcinamy ewentualny ukośnik z początku ścieżki (np. /search -> search)
         $path = ltrim($path, '/');
 
-        // Wyciągamy czysty adres bez parametrów zapytania query string (?param=val)
         $action = explode("?", $path)[0];
 
         foreach (self::$routes as $url => $config) {
@@ -86,14 +84,12 @@ class Routing {
 
                 $controller = new $controllerName();
                 
-                // Przekazujemy ewentualny złapany z regexa identyfikator (\d+) jako argument do metody
                 $argument = isset($matches[1]) ? $matches[1] : null;
                 $controller->$actionName($argument);
                 return;
             }
         }
 
-        // Jeśli żadna ścieżka nie pasuje, wyświetlamy błąd 404
         include 'public/views/404.html';
         exit();
     }

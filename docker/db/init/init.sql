@@ -45,7 +45,6 @@ CREATE TABLE user_progress (
     solved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- WIDOKI POMOCNICZE DLA APLIKACJI I PANELU ADMINA
 CREATE VIEW v_exercise_catalog AS
 SELECT
     e.id AS exercise_id,
@@ -107,11 +106,9 @@ JOIN user_progress up ON up.user_id = u.id
 JOIN fields f ON f.id = up.field_id
 GROUP BY u.id, u.username, f.id, f.number, f.name;
 
--- JEDYNA ROLA W SYSTEMIE - DLA ADMINISTRATORA
 INSERT INTO roles (name) VALUES 
 ('ADMIN');
 
--- WPISYWANIE DZIAŁÓW MATEMATYCZNYCH
 INSERT INTO fields (number, name) VALUES
 ('0', 'Mieszane zadania'),
 ('I', 'Liczby rzeczywiste'),
@@ -129,7 +126,6 @@ INSERT INTO fields (number, name) VALUES
 ('XIII', 'Statystyka'),
 ('XIV', 'Optymalizacja');
 
--- BAZA ZADAŃ MATURALNYCH
 INSERT INTO exercises (field_id, image_url, type, right_answer) VALUES
 (2, 'public/images/exercises/I/1.png', 'ABCD', 'C'),
 (2, 'public/images/exercises/I/2.png', 'ABCD', 'C'),
@@ -181,7 +177,6 @@ INSERT INTO exercises (field_id, image_url, type, right_answer) VALUES
 (15, 'public/images/exercises/XIV/1.png', 'ABCD', 'D'),
 (15, 'public/images/exercises/XIV/2.png', 'ABCD', 'A');
 
--- KILKUNASTU PRZYKŁADOWYCH UŻYTKOWNIKÓW (Czysty tekst, brak hashowania)
 INSERT INTO users (username, email, password) VALUES 
 ('MatmaMistrz', 'mistrz@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
 ('AnkaSkakanka', 'anna.nowak@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
@@ -196,52 +191,40 @@ INSERT INTO users (username, email, password) VALUES
 ('AsKombinatoryki', 'prawdopodobienstwo@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
 ('MaturzystaNaKrawedzi', 'ostatnia.szansa@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm');
 
--- NOWY ELEMENT: DODANIE ADMINISTRATORA (Z podanym przez Ciebie hashem)
 INSERT INTO users (username, email, password) VALUES 
 ('admin', 'admin@example.com', '$2y$10$Iuzxt9Zlcj3.5oC9tGmpYO/tCh5Yv/Ykqnc6KIyKTD0YFM73jI8o.');
 
--- POWIĄZANIE ADMINISTRATORA Z ROLĄ 'ADMIN'
 INSERT INTO user_roles (user_id, role_id) VALUES (
     (SELECT id FROM users WHERE username = 'admin'),
     (SELECT id FROM roles WHERE name = 'ADMIN')
 );
 
--- ZMYŚLONY PROGRESS DLA UŻYTKOWNIKÓW
 INSERT INTO user_progress (user_id, field_id, score, total) VALUES
--- MatmaMistrz
 ((SELECT id FROM users WHERE username = 'MatmaMistrz'), 2, 8, 8),
 ((SELECT id FROM users WHERE username = 'MatmaMistrz'), 3, 3, 3),
 ((SELECT id FROM users WHERE username = 'MatmaMistrz'), 1, 12, 15),
 
--- AnkaSkakanka
 ((SELECT id FROM users WHERE username = 'AnkaSkakanka'), 2, 5, 8),
 ((SELECT id FROM users WHERE username = 'AnkaSkakanka'), 6, 4, 7),
 
--- Kowal99
 ((SELECT id FROM users WHERE username = 'Kowal99'), 4, 1, 3),
 ((SELECT id FROM users WHERE username = 'Kowal99'), 5, 0, 1),
 
--- KrólowaNauk
 ((SELECT id FROM users WHERE username = 'KrólowaNauk'), 2, 7, 8),
 ((SELECT id FROM users WHERE username = 'KrólowaNauk'), 7, 3, 4),
 ((SELECT id FROM users WHERE username = 'KrólowaNauk'), 1, 14, 15),
 
--- PiotrekPolujeNa100
 ((SELECT id FROM users WHERE username = 'PiotrekPolujeNa100'), 2, 8, 8),
 ((SELECT id FROM users WHERE username = 'PiotrekPolujeNa100'), 3, 3, 3),
 ((SELECT id FROM users WHERE username = 'PiotrekPolujeNa100'), 4, 3, 3),
 
--- DeltaUjemna
 ((SELECT id FROM users WHERE username = 'DeltaUjemna'), 2, 2, 8),
 ((SELECT id FROM users WHERE username = 'DeltaUjemna'), 6, 1, 7),
 ((SELECT id FROM users WHERE username = 'DeltaUjemna'), 1, 4, 15),
 
--- SzybkiZmienna
 ((SELECT id FROM users WHERE username = 'SzybkiZmienna'), 6, 6, 7),
 
--- PlanimetriaFan
 ((SELECT id FROM users WHERE username = 'PlanimetriaFan'), 9, 4, 4),
 
--- MaturzystaNaKrawedzi
 ((SELECT id FROM users WHERE username = 'MaturzystaNaKrawedzi'), 2, 4, 8),
 ((SELECT id FROM users WHERE username = 'MaturzystaNaKrawedzi'), 1, 7, 15);

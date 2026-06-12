@@ -1,5 +1,17 @@
 $(document).ready(function() {
-    // Odczyt konfiguracji
+    /**
+     * @typedef {Object} AdminConfig
+     * @property {number|string} currentUserId - ID of the currently logged-in admin.
+     */
+
+    /**
+     * @typedef {Object} AdminUser
+     * @property {number|string} id - User identifier.
+     * @property {string} username - Public username.
+     * @property {string} email - User email address.
+     */
+
+    /** @type {AdminConfig} */
     const config = JSON.parse(document.getElementById('admin-config').textContent);
     const currentUserId = config.currentUserId;
     const deleteModal = document.getElementById('delete-user-modal');
@@ -8,6 +20,13 @@ $(document).ready(function() {
     const deleteModalClose = document.getElementById('delete-user-modal-close');
     const deleteModalCancel = document.getElementById('delete-user-modal-cancel');
 
+    /**
+     * Open the custom delete confirmation modal.
+     *
+     * @param {string} deleteUrl - URL that performs the delete action.
+     * @param {string} username - Username shown in the confirmation text.
+     * @returns {void}
+     */
     function openDeleteModal(deleteUrl, username) {
         deleteModalConfirm.href = deleteUrl;
         deleteModalText.textContent = username
@@ -17,6 +36,11 @@ $(document).ready(function() {
         deleteModal.classList.add('active');
     }
 
+    /**
+     * Close the delete confirmation modal and reset the action URL.
+     *
+     * @returns {void}
+     */
     function closeDeleteModal() {
         deleteModal.classList.remove('active');
         deleteModal.hidden = true;
@@ -46,6 +70,12 @@ $(document).ready(function() {
             contentType: 'application/json',
             data: JSON.stringify({ search: searchValue }),
             dataType: 'json',
+            /**
+             * Render users returned from the admin search endpoint.
+             *
+             * @param {AdminUser[]} users - Search results.
+             * @returns {void}
+             */
             success: function(users) {
                 const $tableBody = $('#users-table-body');
                 $tableBody.empty();
