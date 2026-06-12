@@ -66,3 +66,25 @@ body {
     background: linear-gradient(135deg, #843cae 0%, #7030A0 100%);
     transform: translateY(-1px);
 }
+
+@media (max-width: 560px) {
+    body {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 14vh;
+    }
+
+    .error-container {
+        padding: 32px 18px;
+        border-radius: 14px;
+    }
+
+    .error-code {
+        font-size: 56px;
+    }
+
+    .btn-home {
+        width: 100%;
+        justify-content: center;
+    }
+}

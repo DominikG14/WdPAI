@@ -222,3 +222,78 @@
 .btn-delete-confirm:hover {
     background: #bd2130;
 }
+
+@media (max-width: 760px) {
+    .admin-container {
+        padding: 24px 12px;
+    }
+
+    .admin-header {
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+
+    .admin-header h1 {
+        font-size: 1.45rem;
+        line-height: 1.2;
+    }
+
+    .admin-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-tab {
+        justify-content: center;
+        text-align: center;
+        padding-inline: 10px;
+    }
+
+    .search-box {
+        min-height: 46px;
+    }
+
+    .table-wrap {
+        width: 100%;
+        max-height: none;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .users-table {
+        min-width: 680px;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 9px 10px;
+        font-size: 13px;
+    }
+
+    .btn-progress,
+    .btn-delete,
+    .badge-self {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        white-space: nowrap;
+    }
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-content {
+        width: 100%;
+        padding: 24px 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .btn-cancel,
+    .btn-delete-confirm {
+        width: 100%;
+        text-align: center;
+    }
+}

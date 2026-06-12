@@ -1,3 +1,9 @@
+.index-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
 .hero-section {
     text-align: center;
     padding: 50px 30px;
@@ -346,5 +352,96 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .index-container {
+        padding: 24px 12px;
+    }
+
+    .hero-section {
+        padding: 32px 18px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+        line-height: 1.15;
+    }
+
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .random-section {
+        margin: 28px 0;
+        padding: 24px 16px;
+        border-radius: 16px;
+    }
+
+    .random-section h2,
+    .fields-section h2 {
+        font-size: 1.45rem;
+    }
+
+    .fields-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .field-card {
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .field-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+        padding: 13px 16px;
+    }
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
+
+    .quick-counts {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .quick-count {
+        text-align: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .hero-section h1 {
+        font-size: 1.7rem;
+    }
+
+    .hero-section,
+    .random-section {
+        padding-inline: 14px;
     }
 }

@@ -45,6 +45,68 @@ CREATE TABLE user_progress (
     solved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- WIDOKI POMOCNICZE DLA APLIKACJI I PANELU ADMINA
+CREATE VIEW v_exercise_catalog AS
+SELECT
+    e.id AS exercise_id,
+    e.image_url,
+    e.type,
+    e.right_answer,
+    f.id AS field_id,
+    f.number AS field_number,
+    f.name AS field_name
+FROM exercises e
+JOIN fields f ON f.id = e.field_id;
+
+CREATE VIEW v_field_exercise_stats AS
+SELECT
+    f.id AS field_id,
+    f.number AS field_number,
+    f.name AS field_name,
+    COUNT(e.id) AS exercises_count,
+    COUNT(e.id) FILTER (WHERE e.type = 'ABCD') AS abcd_count,
+    COUNT(e.id) FILTER (WHERE e.type = 'PF') AS pf_count
+FROM fields f
+LEFT JOIN exercises e ON e.field_id = f.id
+GROUP BY f.id, f.number, f.name;
+
+CREATE VIEW v_user_progress_summary AS
+SELECT
+    u.id AS user_id,
+    u.username,
+    u.email,
+    EXISTS (
+        SELECT 1
+        FROM user_roles ur
+        JOIN roles r ON r.id = ur.role_id
+        WHERE ur.user_id = u.id AND r.name = 'ADMIN'
+    ) AS is_admin,
+    COUNT(up.id) AS attempts_count,
+    COALESCE(SUM(up.score), 0) AS score_sum,
+    COALESCE(SUM(up.total), 0) AS total_sum,
+    COALESCE(ROUND((SUM(up.score)::numeric / NULLIF(SUM(up.total), 0)) * 100, 2), 0) AS effectiveness_percent,
+    MAX(up.solved_at) AS last_solved_at
+FROM users u
+LEFT JOIN user_progress up ON up.user_id = u.id
+GROUP BY u.id, u.username, u.email;
+
+CREATE VIEW v_user_field_progress_summary AS
+SELECT
+    u.id AS user_id,
+    u.username,
+    f.id AS field_id,
+    f.number AS field_number,
+    f.name AS field_name,
+    COUNT(up.id) AS attempts_count,
+    COALESCE(SUM(up.score), 0) AS score_sum,
+    COALESCE(SUM(up.total), 0) AS total_sum,
+    COALESCE(ROUND((SUM(up.score)::numeric / NULLIF(SUM(up.total), 0)) * 100, 2), 0) AS effectiveness_percent,
+    MAX(up.solved_at) AS last_solved_at
+FROM users u
+JOIN user_progress up ON up.user_id = u.id
+JOIN fields f ON f.id = up.field_id
+GROUP BY u.id, u.username, f.id, f.number, f.name;
+
 -- JEDYNA ROLA W SYSTEMIE - DLA ADMINISTRATORA
 INSERT INTO roles (name) VALUES 
 ('ADMIN');

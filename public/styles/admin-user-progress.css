@@ -77,3 +77,42 @@
 .score-good { background: #d4edda; color: #155724; }
 .score-bad { background: #f8d7da; color: #721c24; }
 .no-data { text-align: center; padding: 30px; color: var(--text-muted); font-style: italic; background: var(--card-dark); border: 1px solid rgba(213, 184, 234, 0.12); border-radius: 12px; }
+
+@media (max-width: 760px) {
+    .admin-container {
+        padding: 24px 12px;
+    }
+
+    .admin-header {
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+
+    .admin-header h1 {
+        font-size: 1.45rem;
+        line-height: 1.2;
+    }
+
+    .btn-back {
+        width: 100%;
+        justify-content: center;
+        min-height: 42px;
+    }
+
+    .table-wrap {
+        width: 100%;
+        max-height: none;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .progress-table {
+        min-width: 620px;
+    }
+
+    .progress-table th,
+    .progress-table td {
+        padding: 9px 10px;
+        font-size: 13px;
+    }
+}

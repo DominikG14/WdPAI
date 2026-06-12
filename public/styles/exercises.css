@@ -262,3 +262,70 @@
         transform: translateY(0);
     }
 }
+
+@media (max-width: 700px) {
+    .quiz-container {
+        padding: 24px 12px;
+    }
+
+    .exercise-card,
+    .summary-card {
+        padding: 18px 14px;
+        border-radius: 14px;
+    }
+
+    .exercise-card img {
+        padding: 6px;
+        border-radius: 8px;
+    }
+
+    .options-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .btn-option {
+        width: 100%;
+        min-height: 46px;
+        padding: 11px 12px;
+    }
+
+    .quiz-actions {
+        justify-content: stretch;
+    }
+
+    .btn-finish {
+        width: 100%;
+        min-height: 46px;
+    }
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: none;
+        padding: 24px 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions button {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .login-box {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .options-group {
+        grid-template-columns: 1fr;
+    }
+}

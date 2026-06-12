@@ -111,6 +111,10 @@
     color: #fff;
 }
 
+.section-block {
+    min-width: 0;
+}
+
 .field-name {
     max-width: 260px;
 }
@@ -126,5 +130,71 @@
     }
     .table-wrap {
         max-height: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-container {
+        padding: 24px 12px;
+    }
+
+    .dashboard-header {
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.7rem;
+        line-height: 1.2;
+    }
+
+    .section-block h2 {
+        font-size: 1.1rem;
+    }
+
+    .table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .progress-table {
+        min-width: 640px;
+    }
+
+    .summary-table {
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+    .summary-table th,
+    .summary-table td {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .summary-table th:first-child,
+    .summary-table td:first-child {
+        width: 42%;
+    }
+
+    .summary-table th:nth-child(2),
+    .summary-table td:nth-child(2) {
+        width: 20%;
+        text-align: center;
+    }
+
+    .summary-table th:nth-child(3),
+    .summary-table td:nth-child(3),
+    .summary-table th:nth-child(4),
+    .summary-table td:nth-child(4) {
+        width: 19%;
+        text-align: center;
+    }
+
+    .progress-table th,
+    .progress-table td {
+        padding: 9px 10px;
+        font-size: 13px;
     }
 }
