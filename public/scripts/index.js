@@ -23,12 +23,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickCountValues = [5, 10, 15, 20, 25, 30];
 
     // Funkcje do zamykania modali
+    function openFieldModal() {
+        fieldModal.hidden = false;
+        fieldModal.classList.add('active');
+    }
+
     function closeFieldModal() {
         fieldModal.classList.remove('active');
+        fieldModal.hidden = true;
+    }
+
+    function openRandomModal() {
+        randomModal.hidden = false;
+        randomModal.classList.add('active');
     }
 
     function closeRandomModal() {
         randomModal.classList.remove('active');
+        randomModal.hidden = true;
     }
 
     // Event listenery dla zamykania modali
@@ -108,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fieldQuickCounts.appendChild(button);
             }
 
-            fieldModal.classList.add('active');
+            openFieldModal();
             fieldTaskCountInput.focus();
         });
     });
@@ -147,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             randomQuickCounts.appendChild(button);
         });
 
-        randomModal.classList.add('active');
+        openRandomModal();
         randomTaskCountInput.focus();
     });
 

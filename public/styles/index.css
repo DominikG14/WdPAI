@@ -175,6 +175,10 @@
 }
 
 /* Modale - Glassmorphism */
+.modal[hidden] {
+    display: none !important;
+}
+
 .modal {
     display: none;
     position: fixed;

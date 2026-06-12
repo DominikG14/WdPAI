@@ -46,7 +46,11 @@
                                     <?php if ($user->getId() === $_SESSION['user_id']): ?>
                                         <span class="badge-self">To Ty</span>
                                     <?php else: ?>
-                                        <a href="/admin/users/delete/<?= $user->getId(); ?>" class="btn-delete" onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
+                                        <a
+                                            href="/admin/users/delete/<?= $user->getId(); ?>"
+                                            class="btn-delete"
+                                            data-username="<?= htmlspecialchars($user->getUsername()); ?>"
+                                        >
                                             <i class="fa-solid fa-trash"></i> Usuń konto
                                         </a>
                                     <?php endif; ?>
@@ -57,6 +61,22 @@
                 </table>
             </div>
         </section>
+
+        <div id="delete-user-modal" class="modal" hidden>
+            <div class="modal-content">
+                <button class="modal-close" id="delete-user-modal-close" type="button">&times;</button>
+                <div class="modal-header">
+                    <h2>Usuń konto użytkownika</h2>
+                    <p id="delete-user-modal-text">Czy na pewno chcesz usunąć tego użytkownika?</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="delete-user-modal-cancel">Anuluj</button>
+                    <a href="#" class="btn-delete-confirm" id="delete-user-modal-confirm">
+                        <i class="fa-solid fa-trash"></i> Usuń konto
+                    </a>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script id="admin-config" type="application/json">

@@ -57,7 +57,7 @@
 }
 
 .progress-table th {
-    background-color: rgba(112, 48, 160, 0.16);
+    background: #181329;
     color: #fff !important;
     font-weight: bold;
     position: sticky;
