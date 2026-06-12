@@ -38,7 +38,7 @@
                     <input name="password2" type="password" placeholder="Powtórz hasło" minlength="8" maxlength="128" required />
                 </div>
 
-                <input type="hidden" name="returnUrl" id="returnUrl" value="" />
+                <input type="hidden" name="returnUrl" id="returnUrl" value="<?= htmlspecialchars($returnUrl ?? ''); ?>" />
 
                 <button type="submit" class="btn-submit">ZAREJESTRUJ SIĘ</button>
 

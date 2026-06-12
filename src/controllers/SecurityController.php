@@ -59,15 +59,26 @@ class SecurityController extends AppController {
     }
 
     /**
+     * Resolve a safe auth return URL from request data.
+     *
+     * @param string|null $returnUrl URL submitted in GET or POST.
+     * @return string Safe internal URL or an empty string.
+     */
+    private function getSafeReturnUrl(?string $returnUrl): string {
+        return $this->sanitizeReturnUrl($returnUrl) ?? '';
+    }
+
+    /**
      * Render the login form or authenticate submitted credentials.
      *
      * @return void
      */
     public function login() {
         $this->requireHttps();
+        $returnUrl = $this->getSafeReturnUrl($_POST['returnUrl'] ?? $_GET['returnUrl'] ?? null);
 
         if (!$this->isPost()) {
-            return $this->render("login");
+            return $this->render("login", ['returnUrl' => $returnUrl]);
         }
 
         $email = trim($_POST['email'] ?? '');
@@ -82,7 +93,10 @@ class SecurityController extends AppController {
         ) {
             http_response_code(400);
             $this->auditFailedLogin($email, 'invalid_input');
-            return $this->render("login", ['messages' => ['Niepoprawne dane logowania.']]);
+            return $this->render("login", [
+                'messages' => ['Niepoprawne dane logowania.'],
+                'returnUrl' => $returnUrl
+            ]);
         }
 
         $user = $this->usersRepository->getUserByEmail($email);
@@ -90,13 +104,19 @@ class SecurityController extends AppController {
         if (!$user) {
             http_response_code(401);
             $this->auditFailedLogin($email, 'user_not_found');
-            return $this->render("login", ['messages' => ['Niepoprawny email lub haslo.']]);
+            return $this->render("login", [
+                'messages' => ['Niepoprawny email lub haslo.'],
+                'returnUrl' => $returnUrl
+            ]);
         }
 
         if (!password_verify($password, $user->getPassword())) {
             http_response_code(401);
             $this->auditFailedLogin($email, 'invalid_password');
-            return $this->render("login", ['messages' => ['Niepoprawny email lub haslo.']]);
+            return $this->render("login", [
+                'messages' => ['Niepoprawny email lub haslo.'],
+                'returnUrl' => $returnUrl
+            ]);
         }
 
         session_regenerate_id(true);
@@ -105,7 +125,7 @@ class SecurityController extends AppController {
         $_SESSION['is_admin'] = $this->usersRepository->isAdmin($user->getId());
         $_SESSION['justLoggedIn'] = true;
 
-        $this->redirectAfterAuth($_POST['returnUrl'] ?? null);
+        $this->redirectAfterAuth($returnUrl);
     }
 
     /**
@@ -115,9 +135,10 @@ class SecurityController extends AppController {
      */
     public function register() {
         $this->requireHttps();
+        $returnUrl = $this->getSafeReturnUrl($_POST['returnUrl'] ?? $_GET['returnUrl'] ?? null);
 
         if (!$this->isPost()) {
-            return $this->render("register");
+            return $this->render("register", ['returnUrl' => $returnUrl]);
         }
 
         $username = trim($_POST['username'] ?? '');
@@ -135,24 +156,34 @@ class SecurityController extends AppController {
             || !filter_var($email, FILTER_VALIDATE_EMAIL)
         ) {
             http_response_code(400);
-            return $this->render("register", ['messages' => ['Podaj poprawne dane rejestracji.']]);
+            return $this->render("register", [
+                'messages' => ['Podaj poprawne dane rejestracji.'],
+                'returnUrl' => $returnUrl
+            ]);
         }
 
         if ($password !== $password2) {
             http_response_code(400);
-            return $this->render("register", ['messages' => ['Hasla roznia sie.']]);
+            return $this->render("register", [
+                'messages' => ['Hasla roznia sie.'],
+                'returnUrl' => $returnUrl
+            ]);
         }
 
         if (!$this->isPasswordStrong($password)) {
             http_response_code(400);
             return $this->render("register", [
-                'messages' => ['Haslo musi miec co najmniej 8 znakow oraz zawierac mala litere, wielka litere i cyfre.']
+                'messages' => ['Haslo musi miec co najmniej 8 znakow oraz zawierac mala litere, wielka litere i cyfre.'],
+                'returnUrl' => $returnUrl
             ]);
         }
 
         if ($this->usersRepository->emailExists($email)) {
             http_response_code(409);
-            return $this->render("register", ['messages' => ['Email jest juz zajety.']]);
+            return $this->render("register", [
+                'messages' => ['Email jest juz zajety.'],
+                'returnUrl' => $returnUrl
+            ]);
         }
 
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -166,10 +197,13 @@ class SecurityController extends AppController {
             $_SESSION['is_admin'] = $this->usersRepository->isAdmin($newUser->getId());
             $_SESSION['justLoggedIn'] = true;
 
-            $this->redirectAfterAuth($_POST['returnUrl'] ?? null);
+            $this->redirectAfterAuth($returnUrl);
         }
 
-        return $this->render("login", ['messages' => ['Zarejestrowano pomyslnie. Sprobuj sie zalogowac.']]);
+        return $this->render("login", [
+            'messages' => ['Zarejestrowano pomyslnie. Sprobuj sie zalogowac.'],
+            'returnUrl' => $returnUrl
+        ]);
     }
 
     /**

@@ -29,7 +29,7 @@
                     <input name="password" type="password" placeholder="Hasło" maxlength="128" required />
                 </div>
 
-                <input type="hidden" name="returnUrl" id="returnUrl" value="" />
+                <input type="hidden" name="returnUrl" id="returnUrl" value="<?= htmlspecialchars($returnUrl ?? ''); ?>" />
 
                 <button type="submit" class="btn-submit">ZALOGUJ SIĘ</button>
 
