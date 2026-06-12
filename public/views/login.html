@@ -7,7 +7,7 @@
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
-    
+
     <div class="login-page-container">
         <div class="auth-card">
             <form method="POST" action="/login">
@@ -22,15 +22,15 @@
                 <?php endif; ?>
 
                 <div class="input-group">
-                    <input name="email" type="email" placeholder="Adres e-mail" required />
+                    <input name="email" type="email" placeholder="Adres e-mail" maxlength="255" required />
                 </div>
-                
+
                 <div class="input-group">
-                    <input name="password" type="password" placeholder="Hasło" required />
+                    <input name="password" type="password" placeholder="Hasło" maxlength="128" required />
                 </div>
-                
+
                 <input type="hidden" name="returnUrl" id="returnUrl" value="" />
-                
+
                 <button type="submit" class="btn-submit">ZALOGUJ SIĘ</button>
 
                 <div class="form-footer">

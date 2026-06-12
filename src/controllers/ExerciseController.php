@@ -56,6 +56,7 @@ class ExerciseController extends AppController {
 
         // Blokada, jeśli ktoś kombinuje niezalogowany
         if (!isset($_SESSION['user_id'])) {
+            http_response_code(401);
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => 'Musisz być zalogowany']);
             exit();
@@ -64,6 +65,13 @@ class ExerciseController extends AppController {
         // Pobranie danych JSON przesłanych z JavaScriptu
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
+
+        if (!is_array($data) || !isset($data['field_id'], $data['score'], $data['total'])) {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Niepoprawne dane']);
+            exit();
+        }
 
         $fieldId = (int)$data['field_id'];
         $score = (int)$data['score'];

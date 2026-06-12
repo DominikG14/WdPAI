@@ -23,8 +23,8 @@ class DashboardController extends AppController {
     public function dashboard() {
         // Zabezpieczenie: jeśli użytkownik nie jest zalogowany, wyrzuć go do logowania
         if (!isset($_SESSION['user_id'])) {
-            $url = "http://$_SERVER[HTTP_HOST]";
-            header("Location: {$url}/login");
+            http_response_code(401);
+            header("Location: /login");
             exit();
         }
 

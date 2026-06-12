@@ -4,10 +4,23 @@ require_once 'Repository.php';
 require_once __DIR__.'/../models/User.php';
 
 class UsersRepository extends Repository {
+    private static ?UsersRepository $instance = null;
+
+    private function __construct() {
+        parent::__construct();
+    }
+
+    public static function getInstance(): UsersRepository {
+        if (self::$instance === null) {
+            self::$instance = new UsersRepository();
+        }
+
+        return self::$instance;
+    }
 
     public function getUserByEmail(string $email): ?User {
         $stmt = $this->database->connect()->prepare('
-            SELECT * FROM users WHERE email = :email
+            SELECT id, username, email, password FROM users WHERE email = :email
         ');
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
@@ -27,6 +40,16 @@ class UsersRepository extends Repository {
         );
     }
 
+    public function emailExists(string $email): bool {
+        $stmt = $this->database->connect()->prepare('
+            SELECT 1 FROM users WHERE email = :email LIMIT 1
+        ');
+        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return (bool)$stmt->fetchColumn();
+    }
+
     public function addUser(string $username, string $email, string $password) {
         // Dopasowano INSERT dokładnie do kolumn w Twojej bazie danych
         $stmt = $this->database->connect()->prepare('
@@ -42,7 +65,7 @@ class UsersRepository extends Repository {
     }
 
     public function getUsers(): array {
-        $stmt = $this->database->connect()->prepare('SELECT * FROM users');
+        $stmt = $this->database->connect()->prepare('SELECT id, username, email FROM users ORDER BY username ASC');
         $stmt->execute();
         $usersData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -51,7 +74,7 @@ class UsersRepository extends Repository {
             $result[] = new User(
                 $data['username'],
                 $data['email'],
-                $data['password'],
+                null,
                 null, // Usunięto błąd: przekazujemy null zamiast nieistniejącego klucza full_name
                 $data['id']
             );
@@ -94,7 +117,7 @@ class UsersRepository extends Repository {
         }
 
         $stmt = $this->database->connect()->prepare('
-            SELECT * FROM users
+            SELECT id, username, email FROM users
             WHERE LOWER(username) LIKE LOWER(:search)
                OR LOWER(email) LIKE LOWER(:search)
             ORDER BY username ASC
@@ -111,7 +134,7 @@ class UsersRepository extends Repository {
             $result[] = new User(
                 $data['username'],
                 $data['email'],
-                $data['password'],
+                null,
                 null,
                 $data['id']
             );

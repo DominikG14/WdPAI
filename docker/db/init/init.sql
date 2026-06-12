@@ -121,18 +121,18 @@ INSERT INTO exercises (field_id, image_url, type, right_answer) VALUES
 
 -- KILKUNASTU PRZYKŁADOWYCH UŻYTKOWNIKÓW (Czysty tekst, brak hashowania)
 INSERT INTO users (username, email, password) VALUES 
-('MatmaMistrz', 'mistrz@example.com', 'password123'),
-('AnkaSkakanka', 'anna.nowak@example.com', 'password123'),
-('Kowal99', 'kowal99@example.com', 'password123'),
-('KrólowaNauk', 'krolowa@example.com', 'password123'),
-('PiotrekPolujeNa100', 'piotr.mat@example.com', 'password123'),
-('ZdysiekX', 'zdysiek@example.com', 'password123'),
-('SzybkiZmienna', 'x.y.z@example.com', 'password123'),
-('DeltaUjemna', 'brak_rozwiazan@example.com', 'password123'),
-('Calka_z_Kawy', 'student2026@example.com', 'password123'),
-('PlanimetriaFan', 'trojkaty@example.com', 'password123'),
-('AsKombinatoryki', 'prawdopodobienstwo@example.com', 'password123'),
-('MaturzystaNaKrawedzi', 'ostatnia.szansa@example.com', 'password123');
+('MatmaMistrz', 'mistrz@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('AnkaSkakanka', 'anna.nowak@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('Kowal99', 'kowal99@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('KrólowaNauk', 'krolowa@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('PiotrekPolujeNa100', 'piotr.mat@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('ZdysiekX', 'zdysiek@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('SzybkiZmienna', 'x.y.z@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('DeltaUjemna', 'brak_rozwiazan@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('Calka_z_Kawy', 'student2026@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('PlanimetriaFan', 'trojkaty@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('AsKombinatoryki', 'prawdopodobienstwo@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm'),
+('MaturzystaNaKrawedzi', 'ostatnia.szansa@example.com', '$2y$10$AQorn7STxT67uCWbD55O7OQYPMcWPJt8CXOzhpXVYV7pZWJ0TgHXm');
 
 -- NOWY ELEMENT: DODANIE ADMINISTRATORA (Z podanym przez Ciebie hashem)
 INSERT INTO users (username, email, password) VALUES 

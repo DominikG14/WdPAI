@@ -12,6 +12,17 @@ if ($path !== '' && file_exists($path) && is_file($path)) {
 require_once "Routing.php";
 
 // START SESJI
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => true,
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
+ini_set('session.use_strict_mode', '1');
+ini_set('session.cookie_httponly', '1');
+ini_set('session.cookie_secure', '1');
 session_start();
 
 // 3. Uruchamiamy routing dla ścieżek, które NIE są plikami (np. podstrony aplikacji)

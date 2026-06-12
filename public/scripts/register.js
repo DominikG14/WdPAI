@@ -1,13 +1,18 @@
 const form = document.querySelector("form");
 const emailInput = form.querySelector('input[name="email"]');
-const confirmedPasswordInput = form.querySelector('input[name="confirmedPassword"]');
+const passwordInput = form.querySelector('input[name="password"]');
+const confirmedPasswordInput = form.querySelector('input[name="password2"]');
 
 function isEmail(email) {
-    return /\S+@\S+\.\S+/.test(email);
+    return /\S+@\S+\.\S+/.test(email) && email.length <= 255;
 }
 
-function arePasswordsSame(password, confirmedPassword) {
-    return password === confirmedPassword;
+function isPasswordStrong(password) {
+    return password.length >= 8
+        && password.length <= 128
+        && /[a-z]/.test(password)
+        && /[A-Z]/.test(password)
+        && /\d/.test(password);
 }
 
 function markValidation(element, condition) {
@@ -15,24 +20,14 @@ function markValidation(element, condition) {
 }
 
 function validateEmail() {
-    setTimeout(function () {
-            markValidation(emailInput, isEmail(emailInput.value));
-        },
-        1000
-    );
+    markValidation(emailInput, isEmail(emailInput.value));
 }
 
 function validatePassword() {
-    setTimeout(function () {
-            const condition = arePasswordsSame(
-                confirmedPasswordInput.previousElementSibling.value,
-                confirmedPasswordInput.value
-            );
-            markValidation(confirmedPasswordInput, condition);
-        },
-        1000
-    );
+    markValidation(passwordInput, isPasswordStrong(passwordInput.value));
+    markValidation(confirmedPasswordInput, passwordInput.value === confirmedPasswordInput.value);
 }
 
-emailInput.addEventListener('keyup', validateEmail);
-confirmedPasswordInput.addEventListener('keyup', validatePassword);
+emailInput.addEventListener('input', validateEmail);
+passwordInput.addEventListener('input', validatePassword);
+confirmedPasswordInput.addEventListener('input', validatePassword);

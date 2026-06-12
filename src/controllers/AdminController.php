@@ -14,7 +14,7 @@ class AdminController extends AppController {
 
     public function __construct() {
         parent::__construct();
-        $this->usersRepository = new UsersRepository();
+        $this->usersRepository = UsersRepository::getInstance();
         $this->progressRepository = new ProgressRepository(); // Inicjalizacja
         $this->exercisesRepository = new ExercisesRepository();
         $this->fieldsRepository = new FieldsRepository();
@@ -22,8 +22,8 @@ class AdminController extends AppController {
 
     private function checkAdmin() {
         if (!isset($_SESSION['user_id']) || !$this->usersRepository->isAdmin($_SESSION['user_id'])) {
-            $url = "http://$_SERVER[HTTP_HOST]";
-            header("Location: {$url}/index");
+            http_response_code(403);
+            header("Location: /index");
             exit();
         }
     }
@@ -44,8 +44,8 @@ class AdminController extends AppController {
 
         $targetUsername = $this->usersRepository->getUsernameById((int)$id);
         if (!$targetUsername) {
-            $url = "http://$_SERVER[HTTP_HOST]";
-            header("Location: {$url}/admin/users");
+            http_response_code(404);
+            header("Location: /admin/users");
             exit();
         }
 
@@ -77,8 +77,8 @@ class AdminController extends AppController {
         $this->checkAdmin();
 
         if (!$this->isPost()) {
-            $url = "http://$_SERVER[HTTP_HOST]";
-            header("Location: {$url}/admin/exercises");
+            http_response_code(405);
+            header("Location: /admin/exercises");
             exit();
         }
 
@@ -175,8 +175,7 @@ class AdminController extends AppController {
 
         $this->usersRepository->deleteUser((int)$id);
         
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}/admin/users");
+        header("Location: /admin/users");
         exit();
     }
 
