@@ -2,138 +2,9 @@
 <html lang="pl">
 <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title><?= $title ?? 'MaturaMat - Admin'; ?></title>
+    <link rel="stylesheet" href="/public/styles/admin-users.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        .admin-container { 
-            max-width: 1200px; 
-            margin: 18px auto; 
-            padding: 14px; 
-            font-family: Arial, sans-serif; 
-        }
-        .admin-header { 
-            background: #212529; 
-            color: white; 
-            padding: 14px 18px; 
-            border-radius: 8px; 
-            margin-bottom: 18px; 
-        }
-        .admin-header h1 { margin: 0 0 6px; font-size: 24px; }
-        .admin-header p { margin: 0; }
-        .admin-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 14px;
-        }
-        .admin-tab {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            border-radius: 6px;
-            background: #343a40;
-            color: #dee2e6;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 14px;
-            transition: background .2s ease, color .2s ease;
-        }
-        .admin-tab:hover {
-            background: #495057;
-            color: #fff;
-        }
-        .admin-tab.active {
-            background: #0d6efd;
-            color: #fff;
-        }
-        .search-box {
-            width: 100%;
-            padding: 10px 16px;
-            margin: 0 0 18px 0;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-            background-color: white;
-            transition: border-color .2s ease;
-        }
-        .search-box:focus {
-            border-color: #0d6efd;
-            outline: none;
-        }
-        .section-block h2 { margin: 0 0 12px; font-size: 19px; }
-        .table-wrap { 
-            max-height: 65vh; 
-            overflow: auto; 
-            border-radius: 6px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-            background: #fff; 
-            border: 1px solid #ddd;
-        }
-        .users-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            background: #fff; 
-            color: #333 !important;
-        }
-        .users-table th, .users-table td { 
-            padding: 10px 12px; 
-            text-align: left; 
-            border-bottom: 1px solid #ddd; 
-            font-size: 14px;
-            color: #333 !important;
-        }
-        .users-table th { 
-            background-color: #f8f9fa; 
-            color: #333 !important; 
-            font-weight: bold; 
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: inset 0 -1px 0 #ddd;
-        }
-        .users-table tr:hover { 
-            background-color: #f1f1f1; 
-        }
-        .btn-progress {
-            background: #17a2b8; 
-            color: white; 
-            padding: 5px 10px; 
-            border: none;
-            border-radius: 20px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 12px; 
-            margin-right: 5px;
-            display: inline-block;
-        }
-        .btn-progress:hover {
-            background: #138496;
-        }
-        .btn-delete { 
-            background: #dc3545; 
-            color: white; 
-            padding: 5px 10px; 
-            border: none; 
-            border-radius: 20px; 
-            text-decoration: none; 
-            font-weight: bold; 
-            font-size: 12px; 
-            display: inline-block;
-        }
-        .btn-delete:hover { 
-            background: #bd2130; 
-        }
-        .badge-self { 
-            background: #6c757d; 
-            color: white; 
-            padding: 5px 10px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            font-weight: bold;
-            display: inline-block;
-        }
-    </style>
+    <script src="/public/scripts/admin-users.js" defer></script>
 </head>
 <body>
     <?php include __DIR__ . '/partials/nav.html'; ?>
@@ -150,7 +21,6 @@
 
         <section class="section-block">
             <h2>Zarejestrowani użytkownicy</h2>
-
             <input type="text" id="search-input" class="search-box" placeholder="Zacznij pisać, aby wyszukać po loginie lub e-mailu...">
 
             <div class="table-wrap">
@@ -173,13 +43,14 @@
                                     <a href="/admin/users/progress/<?= $user->getId(); ?>" class="btn-progress">
                                         <i class="fa-solid fa-eye"></i> Postępy
                                     </a>
-
                                     <?php if ($user->getId() === $_SESSION['user_id']): ?>
                                         <span class="badge-self">To Ty</span>
                                     <?php else: ?>
-                                        <a href="/admin/users/delete/<?= $user->getId(); ?>" 
-                                           class="btn-delete" 
-                                           onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
+                                        <a
+                                            href="/admin/users/delete/<?= $user->getId(); ?>"
+                                            class="btn-delete"
+                                            data-username="<?= htmlspecialchars($user->getUsername()); ?>"
+                                        >
                                             <i class="fa-solid fa-trash"></i> Usuń konto
                                         </a>
                                     <?php endif; ?>
@@ -190,70 +61,26 @@
                 </table>
             </div>
         </section>
+
+        <div id="delete-user-modal" class="modal" hidden>
+            <div class="modal-content">
+                <button class="modal-close" id="delete-user-modal-close" type="button">&times;</button>
+                <div class="modal-header">
+                    <h2>Usuń konto użytkownika</h2>
+                    <p id="delete-user-modal-text">Czy na pewno chcesz usunąć tego użytkownika?</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="delete-user-modal-cancel">Anuluj</button>
+                    <a href="#" class="btn-delete-confirm" id="delete-user-modal-confirm">
+                        <i class="fa-solid fa-trash"></i> Usuń konto
+                    </a>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <script>
-        $(document).ready(function() {
-            const currentUserId = <?= json_encode($_SESSION['user_id']); ?>;
-
-            $('#search-input').on('input', function() {
-                const searchValue = $(this).val();
-
-                $.ajax({
-                    url: '/admin/users/search',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ search: searchValue }),
-                    dataType: 'json',
-                    success: function(users) {
-                        const $tableBody = $('#users-table-body');
-                        $tableBody.empty();
-
-                        if (users.length === 0) {
-                            $tableBody.append('<tr><td colspan="4" style="text-align:center; color: #666; font-style: italic; padding: 20px;">Nie znaleziono dopasowań.</td></tr>');
-                            return;
-                        }
-
-                        users.forEach(function(user) {
-                            let actionButton = '';
-                            
-                            if (parseInt(user.id) === parseInt(currentUserId)) {
-                                actionButton = '<span class="badge-self">To Ty</span>';
-                            } else {
-                                actionButton = `
-                                    <a href="/admin/users/delete/${user.id}" 
-                                       class="btn-delete" 
-                                       onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
-                                        <i class="fa-solid fa-trash"></i> Usuń konto
-                                    </a>
-                                `;
-                            }
-
-                            const safeUsername = $('<div>').text(user.username).html();
-                            const safeEmail = $('<div>').text(user.email).html();
-
-                            const row = `
-                                <tr>
-                                    <td>${user.id}</td>
-                                    <td><strong>${safeUsername}</strong></td>
-                                    <td>${safeEmail}</td>
-                                    <td>
-                                        <a href="/admin/users/progress/${user.id}" class="btn-progress">
-                                            <i class="fa-solid fa-eye"></i> Postępy
-                                        </a>
-                                        ${actionButton}
-                                    </td>
-                                </tr>
-                            `;
-                            $tableBody.append(row);
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Błąd AJAX: ", error);
-                    }
-                });
-            });
-        });
+    <script id="admin-config" type="application/json">
+        {"currentUserId": <?= json_encode($_SESSION['user_id']); ?>}
     </script>
 </body>
 </html>
