@@ -185,44 +185,54 @@ docker/db/init/init.sql
 
 ### 🏠 Strona Główna
 ![Strona główna](/docs/screens/home.png)
+
 *Główny punkt wejściowy do aplikacji. Zawiera intuicyjne nawigowanie, szybki dostęp do rozpoczęcia testu oraz krótką prezentację możliwości systemu.*
 
 ### 📊 Dashboard Użytkownika
 ![Dashboard użytkownika](/docs/screens/dashboard.png)
+
 *Spersonalizowany panel, w którym uczeń może śledzić swoją historię postępów, statystyki.*
 
 ### ⚙️ Konfiguracja Testu
-![Modal wyboru liczby zadań](/docs/screens/task-count-modal.png)
+![Modal wyboru liczby zadań](/docs/screens/exercise-count-modal.png)
+
 *Pozwala użytkownikowi na szybkie określenie preferowanej liczby zadań do rozwiązania, z opcją wyboru wartości domyślnych (szybki wybór).*
 
 ### 📝 Rozwiązywanie Zadań
 ![Rozwiązywanie zadań](/docs/screens/quiz.png)
+
 *Ekran właściwego testu. Interfejs skupiony na zadaniu, zapewniający czytelność treści matematycznych oraz łatwy sposób zaznaczania odpowiedzi.*
 
 ### 🏆 Podsumowanie Wyników
 ![Podsumowanie testu](/docs/screens/summary.png)
+
 *Po zakończeniu testu użytkownik otrzymuje zestawienie swoich odpowiedzi wraz z wynikiem punktowym, co pozwala na błyskawiczną analizę błędów.*
 
 ### 🔐 Autoryzacja i Dostęp
 #### Logowanie
 ![Logowanie](/docs/screens/login.png)
+
 *Bezpieczny formularz logowania z przejrzystym układem pól, zaprojektowany z myślą o szybkiej autoryzacji użytkownika.*
 
 #### Rejestracja
 ![Rejestracja](/docs/screens/register.png)
+
 *Formularz pozwalający na dołączenie do platformy.*
 
 ### 🛡️ Panel Administratora
 #### Zarządzanie Użytkownikami
 ![Panel administratora - użytkownicy](/docs/screens/admin-users.png)
+
 *Narzędzie administracyjne umożliwiające podgląd zarejestrowanych użytkowników.*
 
 #### Zarządzanie Bazą Zadań
 ![Panel administratora - zadania](/docs/screens/admin-exercises.png)
+
 *Moduł zarządzania bazą zadań: dodawanie nowych treści, filtrowanie po działach oraz podgląd graficzny zdjęć zadań.*
 
 ### 📱 Responsywność (Mobile)
 ![Wersja mobilna](/docs/screens/mobile-home.png)
+
 *Responsywny widok strony głównej, w pełni dostosowany do urządzeń mobilnych dla wygody nauki w dowolnym miejscu.*
 
 ## Struktura Projektu
